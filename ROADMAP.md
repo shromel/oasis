@@ -8,6 +8,13 @@ A crossover of **Hevy (training)** × **Cronometer (nutrition)** with a "golden 
 - Run: `npm run dev` (port 5173). Build: `npm run build`.
 - Node is 18.15 on this machine — keep deps Node-18 compatible.
 
+## Hosting / deploy
+- **Live PWA:** https://shromel.github.io/oasis/ — public repo `shromel/oasis`.
+- **Auto-deploys on every push to `main`** via `.github/workflows/deploy.yml` (build → GitHub Pages). So shipping changes = `git push`.
+- Vite `base: './'` (relative) so it works under the `/oasis/` subpath. Routing is HashRouter (deep links work on Pages). PWA = static `manifest.webmanifest` + `sw.js` + PNG icons from `scripts/gen-icons.cjs` (sharp@0.32, pinned for Node 18).
+- CI uses `npm install` (not `npm ci`) to avoid lockfile-strictness failures across npm versions.
+- Install on iPhone: open the URL in Safari → Share → Add to Home Screen.
+
 ## Theme tokens (tailwind.config.js)
 `sand.50–950`, `gold` (+light/deep), `oasis.green/teal/water/palm`, `dusk.rose/violet`. Helpers in index.css: `.glass`, `.glass-soft`, `.heading`, `.gold-text`, `.btn-gold`, `.btn-ghost`, `.chip`. Signature visual: `src/components/OasisScene.tsx` blooms from barren→lush by a `growth` 0–1 prop.
 
