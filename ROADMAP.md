@@ -1,0 +1,53 @@
+# Oasis — Roadmap
+
+A crossover of **Hevy (training)** × **Cronometer (nutrition)** with a "golden oasis rising from the barrens" theme. Built as an installable **PWA** (works on iPhone + MacBook), **local-first** (no backend), data in `localStorage` via Zustand `persist`.
+
+## Stack
+- Vite + React + TypeScript, Tailwind 3, Zustand (persist), React Router (HashRouter), Recharts, lucide-react.
+- PWA via static `public/manifest.webmanifest` + hand-written `public/sw.js` (we dropped `vite-plugin-pwa` — it crashes on Node 18 with a `workbox-build` dynamic-require bug).
+- Run: `npm run dev` (port 5173). Build: `npm run build`.
+- Node is 18.15 on this machine — keep deps Node-18 compatible.
+
+## Theme tokens (tailwind.config.js)
+`sand.50–950`, `gold` (+light/deep), `oasis.green/teal/water/palm`, `dusk.rose/violet`. Helpers in index.css: `.glass`, `.glass-soft`, `.heading`, `.gold-text`, `.btn-gold`, `.btn-ghost`, `.chip`. Signature visual: `src/components/OasisScene.tsx` blooms from barren→lush by a `growth` 0–1 prop.
+
+## ✅ Done (v1 — Workout tracking + Levels)
+- Full program imported from the user's checklist → `src/data/program.ts` (4 levels, outdoor/home splits, warm-ups, exit criteria, retest battery, muscle map, timeline). **User starts at Level 1.**
+- Store `src/store/useStore.ts`: profile, currentLevel, auto-progressed targets, sessions, retests, bodyweight; selectors for streak, weekly count, level-exit progress, current bests. Export/import JSON (the Mac↔phone bridge).
+- Pages: **Oasis** (dashboard: scene, streak, level-exit rings), **Train** (level browser + blocks + warm-up), **SessionLogger** (per-set steppers, mark-done, auto-progression on save), **Progress** (current bests, strength curve chart, 4-week retest form, history), **Nourish** (placeholder previewing nutrition), **You** (profile, level control, export/import, reset).
+- Auto-progression rule implemented: hit target top across all sets 2 sessions in a row → target +1.
+
+## 🔜 Next up (priority order)
+
+### 1. Nutrition core (the "Cronometer" half) — biggest chunk
+- **Food DB decision still open** (user said "decide later"). Default plan: **Open Food Facts** (`https://world.openfoodfacts.org/api/v2/product/{barcode}.json`) — free, no key, great barcode coverage + many micros. Consider USDA FoodData Central (needs a free key) as a fallback for whole-food micro accuracy.
+- Data model: `Food { id, name, brand, barcode, serving{g/ml}, per100g: { kcal, protein, carbs, fat, fiber, ...micros } }`, `FoodLog { date, foodId, grams, meal }`. Move food logs to **IndexedDB (Dexie)** when volume grows — localStorage is fine until then.
+- Diary screen: meals (breakfast/lunch/dinner/snack), add food, edit serving, daily totals.
+
+### 2. Barcode scanning
+- Use the browser **`BarcodeDetector` API** where available (Chrome/Android, some iOS) with **`@zxing/browser`** as fallback for iOS Safari. `getUserMedia({ video: { facingMode: 'environment' } })`. Scan → barcode → Open Food Facts lookup → confirm serving → log.
+
+### 3. Macros + micros + nutrition score
+- Macro rings (protein/carb/fat) + calorie total on a daily "Nourish" dashboard.
+- Micro tracking list (vitamins + minerals) vs RDA targets (compute RDA from profile sex/age).
+- **0–100 nutrition score**: Cronometer-style completeness — weight by how many micro targets are met, lightly penalize big macro misses. Put the formula in `src/lib/nutritionScore.ts`.
+
+### 4. Calorie balance (surplus/deficit)
+- Compute TDEE: **Mifflin-St Jeor** BMR (profile has weight/height/age/sex) × activity factor; goal (cut/maintain/bulk) sets target delta. Profile + goal fields already exist in the store.
+- Daily intake − target → surplus/deficit, themed (bulk = greener/lusher, cut = leaner). Bodyweight log already in store — overlay it.
+
+### 5. Unified "Vitality" score + gamification polish
+- Fuse nutrition score + training adherence into one daily Vitality number that drives `OasisScene` growth (currently growth is training-only: level + exit% + streak).
+- Streak = "water level"; bloom milestones; level-up celebration animation; 4-week retest reminders; weekly review screen.
+
+### 6. Progress graphs expansion
+- Add weight trend, calorie-balance trend, nutrition-score trend, per-lift volume. Recharts already wired in Progress.
+
+### 7. Real cross-device sync (optional, if export/import isn't enough)
+- Lightweight option: Supabase (free tier) or a tiny key-value store with a sync token. Only if the user wants automatic sync — export/import covers manual today.
+
+### 8. Nice-to-haves
+- Rest timer between sets in SessionLogger. PNG app icons (currently SVG-only manifest). Onboarding flow on first launch to collect profile. "Per side" exercises: log each side separately.
+
+## Notes / gotchas
+- Preview tooling in this workspace is scoped to the sibling `Options` project's working dir; an `oasis` config was added to `/Users/ahus/Documents/Options/.claude/launch.json` (runs `npm --prefix /Users/ahus/Documents/Oasis run dev`) so the preview server can serve this app on port 5173.

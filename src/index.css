@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #f3e6cf;
+  background-color: #130d07;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* Living cavern-oasis atmosphere behind everything:
+   gold light from above, lush green glow at the sides, deep teal water-light
+   pooling at the bottom, and a dark vignette for cavern depth. */
+#root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(140% 85% at 50% -12%, rgba(231, 178, 76, 0.22) 0%, rgba(231, 178, 76, 0) 46%),
+    radial-gradient(85% 55% at 14% 22%, rgba(63, 138, 91, 0.16) 0%, rgba(63, 138, 91, 0) 55%),
+    radial-gradient(85% 55% at 88% 18%, rgba(47, 125, 114, 0.16) 0%, rgba(47, 125, 114, 0) 55%),
+    radial-gradient(130% 80% at 50% 112%, rgba(28, 111, 104, 0.22) 0%, rgba(28, 111, 104, 0) 58%),
+    radial-gradient(120% 120% at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.55) 100%),
+    linear-gradient(180deg, #17140c 0%, #0f130d 48%, #0a0e0b 100%);
+}
+
+/* faint sand grain */
+#root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@layer components {
+  .glass {
+    @apply bg-sand-900/40 backdrop-blur-xl border border-sand-700/40 rounded-3xl shadow-card;
+  }
+  .glass-soft {
+    @apply bg-sand-900/30 backdrop-blur-md border border-sand-700/30 rounded-2xl;
+  }
+  .heading {
+    @apply font-display tracking-tight text-sand-50;
+  }
+  .gold-text {
+    background: linear-gradient(120deg, #f6d488, #e7b24c 45%, #c8902f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .btn-gold {
+    @apply font-semibold text-sand-950 rounded-2xl px-5 py-3 transition active:scale-[0.97];
+    background: linear-gradient(135deg, #f6d488, #e7b24c 55%, #c8902f);
+    box-shadow: 0 8px 24px -10px rgba(231, 178, 76, 0.7);
+  }
+  .btn-ghost {
+    @apply font-medium rounded-2xl px-5 py-3 border border-sand-600/50 text-sand-100/90 transition active:scale-[0.97] bg-sand-800/30;
+  }
+  .chip {
+    @apply text-xs font-medium px-2.5 py-1 rounded-full bg-sand-800/50 border border-sand-600/40 text-sand-100/80;
+  }
+}
+
+/* hide number input spinners for a cleaner look */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 5.5rem);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
