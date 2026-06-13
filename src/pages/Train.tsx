@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, ChevronDown, Play } from 'lucide-react'
+import { ChevronDown, Play, Check, Pencil } from 'lucide-react'
 import { LEVELS, WARMUPS, getLevel, type Block, type Exercise } from '../data/program'
-import { useStore } from '../store/useStore'
+import { useStore, todaySessionForBlock } from '../store/useStore'
 
 export default function Train() {
   const navigate = useNavigate()
   const currentLevel = useStore((s) => s.currentLevel)
   const getTarget = useStore((s) => s.getTarget)
+  const sessions = useStore((s) => s.sessions)
   const [viewLevel, setViewLevel] = useState(currentLevel)
   const [warmOpen, setWarmOpen] = useState(false)
   const level = getLevel(viewLevel)
@@ -77,14 +78,19 @@ export default function Train() {
       </div>
 
       {/* blocks */}
-      {level.blocks.map((block) => (
-        <BlockCard
-          key={block.id}
-          block={block}
-          getTarget={getTarget}
-          onStart={() => navigate(`/train/${level.id}/${block.id}`)}
-        />
-      ))}
+      {level.blocks.map((block) => {
+        const logged = todaySessionForBlock(sessions, block.id)
+        return (
+          <BlockCard
+            key={block.id}
+            block={block}
+            getTarget={getTarget}
+            logged={!!logged}
+            onStart={() => navigate(`/train/${level.id}/${block.id}`)}
+            onEdit={() => logged && navigate(`/train/${level.id}/${block.id}?edit=${logged.id}`)}
+          />
+        )
+      })}
     </div>
   )
 }
@@ -92,11 +98,15 @@ export default function Train() {
 function BlockCard({
   block,
   getTarget,
+  logged,
   onStart,
+  onEdit,
 }: {
   block: Block
   getTarget: (id: string, fb: number | null) => number | null
+  logged: boolean
   onStart: () => void
+  onEdit: () => void
 }) {
   return (
     <section className="glass overflow-hidden">
@@ -107,9 +117,20 @@ function BlockCard({
           </h2>
           {block.subtitle && <p className="text-sand-200/55 text-xs mt-0.5">{block.subtitle}</p>}
         </div>
-        <button onClick={onStart} className="btn-gold !px-4 !py-2.5 flex items-center gap-1.5 text-sm">
-          <Play size={15} /> Start
-        </button>
+        {logged ? (
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-oasis-palm text-xs font-medium">
+              <Check size={14} /> Done today
+            </span>
+            <button onClick={onEdit} className="btn-ghost !px-3 !py-2 flex items-center gap-1.5 text-sm">
+              <Pencil size={14} /> Edit
+            </button>
+          </div>
+        ) : (
+          <button onClick={onStart} className="btn-gold !px-4 !py-2.5 flex items-center gap-1.5 text-sm">
+            <Play size={15} /> Start
+          </button>
+        )}
       </div>
       <ul className="divide-y divide-sand-700/25">
         {block.exercises.map((e) => (

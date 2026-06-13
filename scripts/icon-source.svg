@@ -1,47 +1,63 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1c1810"/>
-      <stop offset="55%" stop-color="#12130d"/>
-      <stop offset="100%" stop-color="#0a0e0b"/>
+      <stop offset="0%" stop-color="#123a2b"/>
+      <stop offset="55%" stop-color="#0f2c24"/>
+      <stop offset="100%" stop-color="#0a1f1c"/>
     </linearGradient>
-    <radialGradient id="sun" cx="50%" cy="45%" r="55%">
-      <stop offset="0%" stop-color="#fbe6ab"/>
-      <stop offset="55%" stop-color="#e7b24c"/>
-      <stop offset="100%" stop-color="#c8902f"/>
+    <radialGradient id="sun" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#fff0c4"/>
+      <stop offset="55%" stop-color="#f6c45a"/>
+      <stop offset="100%" stop-color="#e09a35"/>
     </radialGradient>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#e7b24c" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#e7b24c" stop-opacity="0"/>
+    <radialGradient id="glow" cx="50%" cy="42%" r="50%">
+      <stop offset="0%" stop-color="#ffd970" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffd970" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="pool" cx="50%" cy="35%" r="70%">
-      <stop offset="0%" stop-color="#7fe6e0"/>
-      <stop offset="50%" stop-color="#2f9d92"/>
-      <stop offset="100%" stop-color="#0c3b3a"/>
-    </radialGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5fe6e0"/>
+      <stop offset="55%" stop-color="#1aa6bd"/>
+      <stop offset="100%" stop-color="#0c6f7e"/>
+    </linearGradient>
+    <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0d488"/>
+      <stop offset="100%" stop-color="#b88f44"/>
+    </linearGradient>
+    <linearGradient id="frond" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3fb574"/>
+      <stop offset="100%" stop-color="#176945"/>
+    </linearGradient>
   </defs>
 
   <rect width="512" height="512" fill="url(#bg)"/>
-  <circle cx="256" cy="240" r="220" fill="url(#glow)"/>
+  <circle cx="256" cy="210" r="230" fill="url(#glow)"/>
+
+  <!-- jungle canopy silhouette behind -->
+  <path d="M0 300 Q 90 200 180 250 Q 256 190 332 250 Q 420 200 512 290 L512 360 L0 360 Z" fill="#0f3d2e"/>
 
   <!-- sun -->
-  <circle cx="256" cy="210" r="92" fill="url(#sun)"/>
+  <circle cx="256" cy="206" r="92" fill="url(#sun)"/>
 
-  <!-- teal spring -->
-  <ellipse cx="256" cy="392" rx="150" ry="34" fill="url(#pool)"/>
-  <ellipse cx="256" cy="382" rx="150" ry="22" fill="#cffaf3" opacity="0.22"/>
+  <!-- turquoise sea + golden beach -->
+  <rect x="0" y="356" width="512" height="70" fill="url(#sea)"/>
+  <path d="M0 410 Q 256 388 512 410 L512 512 L0 512 Z" fill="url(#sand)"/>
 
-  <!-- oasis bed -->
-  <path d="M150 396 Q256 352 362 396 Q256 420 150 396 Z" fill="#3f8a5b"/>
-
-  <!-- palm -->
-  <g stroke-linecap="round" fill="none">
-    <path d="M256 392 q10 -120 2 -210" stroke="#6b4a2a" stroke-width="14"/>
-    <path d="M258 182 q -70 -28 -118 6" stroke="#5aa469" stroke-width="11"/>
-    <path d="M258 182 q -50 -42 -104 -40" stroke="#5aa469" stroke-width="11"/>
-    <path d="M258 182 q 70 -28 118 6" stroke="#5aa469" stroke-width="11"/>
-    <path d="M258 182 q 50 -42 104 -40" stroke="#5aa469" stroke-width="11"/>
-    <path d="M258 182 q -8 -34 0 -64" stroke="#5aa469" stroke-width="11"/>
+  <!-- bold filled palm -->
+  <g>
+    <!-- trunk -->
+    <path d="M236 430 C 244 360 250 300 250 232 L 270 232 C 270 300 268 364 280 430 Z" fill="#6b4a2a"/>
+    <!-- fronds -->
+    <g fill="url(#frond)" stroke="#0f4730" stroke-width="3">
+      <path d="M260 232 q -120 -34 -176 18 q 96 -20 176 6 Z"/>
+      <path d="M260 232 q -96 -70 -170 -64 q 86 12 170 40 Z"/>
+      <path d="M260 232 q -34 -98 -8 -168 q -16 80 8 168 Z"/>
+      <path d="M260 232 q 120 -34 176 18 q -96 -20 -176 6 Z"/>
+      <path d="M260 232 q 96 -70 170 -64 q -86 12 -170 40 Z"/>
+      <path d="M260 232 q 44 -92 116 -118 q -78 38 -116 118 Z"/>
+    </g>
+    <circle cx="260" cy="232" r="13" fill="#176945"/>
+    <!-- coconuts -->
+    <circle cx="246" cy="246" r="9" fill="#4a2f18"/>
+    <circle cx="274" cy="246" r="9" fill="#4a2f18"/>
   </g>
-  <circle cx="258" cy="182" r="9" fill="#3f8a5b"/>
 </svg>

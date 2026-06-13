@@ -18,27 +18,27 @@ body {
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
   color: #f3e6cf;
-  background-color: #130d07;
+  background-color: #0b1310;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
 
-/* Living cavern-oasis atmosphere behind everything:
-   gold light from above, lush green glow at the sides, deep teal water-light
-   pooling at the bottom, and a dark vignette for cavern depth. */
+/* Brazilian jungle & coast atmosphere behind everything:
+   golden sun from above, saturated emerald jungle glowing at the sides,
+   a turquoise coastal sea pooling at the bottom, and a dark vignette for depth. */
 #root::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(140% 85% at 50% -12%, rgba(231, 178, 76, 0.22) 0%, rgba(231, 178, 76, 0) 46%),
-    radial-gradient(85% 55% at 14% 22%, rgba(63, 138, 91, 0.16) 0%, rgba(63, 138, 91, 0) 55%),
-    radial-gradient(85% 55% at 88% 18%, rgba(47, 125, 114, 0.16) 0%, rgba(47, 125, 114, 0) 55%),
-    radial-gradient(130% 80% at 50% 112%, rgba(28, 111, 104, 0.22) 0%, rgba(28, 111, 104, 0) 58%),
-    radial-gradient(120% 120% at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.55) 100%),
-    linear-gradient(180deg, #17140c 0%, #0f130d 48%, #0a0e0b 100%);
+    radial-gradient(135% 80% at 50% -10%, rgba(246, 196, 90, 0.20) 0%, rgba(246, 196, 90, 0) 44%),
+    radial-gradient(80% 58% at 10% 28%, rgba(47, 158, 99, 0.22) 0%, rgba(47, 158, 99, 0) 55%),
+    radial-gradient(80% 58% at 90% 24%, rgba(31, 122, 82, 0.20) 0%, rgba(31, 122, 82, 0) 55%),
+    radial-gradient(135% 85% at 50% 115%, rgba(26, 166, 189, 0.24) 0%, rgba(26, 166, 189, 0) 60%),
+    radial-gradient(120% 120% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.6) 100%),
+    linear-gradient(180deg, #14160d 0%, #0d150f 46%, #0a130f 100%);
 }
 
 /* faint sand grain */

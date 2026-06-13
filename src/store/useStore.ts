@@ -64,6 +64,7 @@ export interface OasisState {
   setLevel: (level: number) => void
   getTarget: (exerciseId: string, fallback: number | null) => number | null
   saveSession: (s: Omit<Session, 'id' | 'date'> & { date?: string }) => void
+  updateSession: (id: string, patch: { entries: LoggedEntry[]; note?: string }) => void
   deleteSession: (id: string) => void
   addRetest: (values: Record<string, number>, date?: string) => void
   logBodyweight: (kg: number, date?: string) => void
@@ -128,6 +129,16 @@ export const useStore = create<OasisState>()(
           return { sessions: [session, ...s.sessions], targets }
         })
       },
+
+      // Editing an existing session only revises the recorded numbers/note.
+      // Auto-progression targets are intentionally left untouched (they were
+      // settled when the session was first banked) to avoid double-counting.
+      updateSession: (id, patch) =>
+        set((s) => ({
+          sessions: s.sessions.map((x) =>
+            x.id === id ? { ...x, entries: patch.entries, note: patch.note } : x,
+          ),
+        })),
 
       deleteSession: (id) =>
         set((s) => ({ sessions: s.sessions.filter((x) => x.id !== id) })),
@@ -226,6 +237,62 @@ export function computeStreak(sessions: Session[]): number {
 export function sessionsThisWeek(sessions: Session[]): number {
   const weekAgo = Date.now() - 7 * 864e5
   return sessions.filter((s) => new Date(s.date).getTime() >= weekAgo).length
+}
+
+/** Local-day key (YYYY-MM-DD) used to decide whether two sessions are "same day". */
+export const dayKey = (iso: string | Date = new Date()): string => {
+  const d = typeof iso === 'string' ? new Date(iso) : iso
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/** The session (if any) already logged today for a given block. */
+export function todaySessionForBlock(sessions: Session[], blockId: string): Session | undefined {
+  const key = dayKey()
+  return sessions.find((s) => s.blockId === blockId && dayKey(s.date) === key)
+}
+
+const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0)
+const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
+
+/**
+ * "Bloom" — how lush the oasis is. Driven mainly by *training momentum* read
+ * from your logs (is your per-exercise volume trending up?), blended with
+ * structural journey progress through the 4 levels. Falls back to journey
+ * progress before you have enough logs to show a trend.
+ */
+export function bloomScore(state: OasisState): { value: number; trendPct: number | null } {
+  const { pct } = levelProgress(state)
+  const journey = clamp01((state.currentLevel - 1 + pct / 100) / LEVELS.length)
+
+  // Collect per-exercise session volumes (total reps/seconds across sets).
+  const byEx = new Map<string, { date: string; vol: number }[]>()
+  for (const s of state.sessions) {
+    for (const e of s.entries) {
+      const vol = e.sets.reduce((a, b) => a + (b || 0), 0)
+      if (vol <= 0) continue
+      const arr = byEx.get(e.exerciseId) ?? []
+      arr.push({ date: s.date, vol })
+      byEx.set(e.exerciseId, arr)
+    }
+  }
+
+  const ratios: number[] = []
+  byEx.forEach((arr) => {
+    if (arr.length < 2) return
+    arr.sort((a, b) => a.date.localeCompare(b.date)) // oldest first
+    const early = avg(arr.slice(0, Math.min(2, arr.length - 1)).map((x) => x.vol))
+    const recent = avg(arr.slice(-2).map((x) => x.vol))
+    if (early > 0) ratios.push(recent / early)
+  })
+
+  if (ratios.length === 0) {
+    return { value: Math.max(0.08, journey), trendPct: null }
+  }
+
+  const meanRatio = avg(ratios)
+  const momentum = clamp01((meanRatio - 0.6) / 0.8) // -40% → 0, +40% → 1
+  const value = clamp01(0.6 * momentum + 0.4 * journey)
+  return { value: Math.max(0.08, value), trendPct: Math.round((meanRatio - 1) * 100) }
 }
 
 /** 0-100 progress toward the current level's numeric exit criteria. */
