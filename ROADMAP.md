@@ -16,7 +16,7 @@ A crossover of **Hevy (training)** × **Cronometer (nutrition)** with a "golden 
 - Install on iPhone: open the URL in Safari → Share → Add to Home Screen.
 
 ## Theme tokens (tailwind.config.js)
-`sand.50–950`, `gold` (+light/deep), `oasis.green/teal/water/palm`, `dusk.rose/violet`. Helpers in index.css: `.glass`, `.glass-soft`, `.heading`, `.gold-text`, `.btn-gold`, `.btn-ghost`, `.chip`. Signature visual: `src/components/OasisScene.tsx` blooms from barren→lush by a `growth` 0–1 prop.
+`sand.50–950`, `gold` (+light/deep), `oasis.green/teal/water/palm`, `dusk.rose/violet`. Helpers in index.css: `.glass`, `.glass-soft`, `.heading`, `.gold-text`, `.btn-gold`, `.btn-ghost`, `.chip`. **Direction = premium/luxury gold-on-emerald, earthy.** Signature visual is now the hero **`src/components/LevelTrajectory.tsx`** (gold-foil area chart of log-based progress). The old cartoon `OasisScene` was removed (user disliked the "wimpy vegetation"); the app icon is a refined gold crest emblem (`scripts/icon-source.svg`).
 
 ## ✅ Done (v1 — Workout tracking + Levels)
 - Full program imported from the user's checklist → `src/data/program.ts` (4 levels, outdoor/home splits, warm-ups, exit criteria, retest battery, muscle map, timeline). **User starts at Level 1.**
@@ -30,6 +30,14 @@ A crossover of **Hevy (training)** × **Cronometer (nutrition)** with a "golden 
 - **Theme → bold Brazilian jungle & coast** (kept the dark-gold + lush-green soul): `OasisScene.tsx` rebuilt from **solid filled shapes** (canopy mounds, palms with real fronds, big leaves, foliage bushes, turquoise sea, golden beach, fireflies) — no more thin line-art. Background palette in `index.css` shifted to saturated emerald + turquoise + gold.
 - **New bolder app icon + favicon** (`scripts/icon-source.svg` → `gen-icons.cjs`; `public/favicon.svg`). PNG icons now in manifest.
 - **Same-day lock + edit**: a block already logged today shows "✓ Done today" + **Edit** (not Start) in `Train.tsx`; `SessionLogger` blocks duplicate same-day logging (lock screen → Edit) and supports editing via `?edit=<sessionId>`, prefilling saved sets. Store gained `updateSession()`, and selectors `dayKey()`, `todaySessionForBlock()`.
+
+## ✅ Done (v1.2 — premium finish + log-based trajectory, 2026-06-14)
+- **Hero is now a log-based progress chart** (`LevelTrajectory.tsx`) toward the next level — gold-foil area chart with a 100% target line + glowing endpoint. Series from `levelProgressSeries(state)` (best set per exit-metric, accumulated; folds in baseline + retests). Replaced the jungle banner.
+- **`bestFor` is now log-aware** (max logged set per metric, baseline as floor) so the hero %, the "Path to next level" ring, and the Progress "current bests" all **agree**.
+- **Progress tab "current bests" show current / goal** vs the level's exit (e.g. "Max strict pullups 6 / 8") with mini bars.
+- **Premium logo**: refined gold crest emblem (`scripts/icon-source.svg` + `favicon.svg`); removed `OasisScene.tsx`.
+- **Renamed "Oasis" tab → "Home"** (house icon) and de-cringed microcopy ("Session saved" / "Logged to your progress"; cleaner level taglines).
+- Hero still shows **momentum %** (`bloomScore.trendPct`) as a stat; "bloom" wording dropped from the UI.
 
 ## 👉 START HERE NEXT — Nourish (nutrition) kickoff
 The next session builds the **Nourish** half. A typed foundation already exists in **`src/lib/nutrition.ts`** (pure functions, no UI yet): `Food`/`FoodLog` types, `fetchOpenFoodFacts(barcode)`, `mifflinStTdee(profile)`, `rdaTargets(profile)`, `nutritionScore(totals, targets)`. First steps:

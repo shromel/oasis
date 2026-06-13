@@ -120,8 +120,8 @@ export default function SessionLogger() {
         <div className="w-20 h-20 rounded-full bg-oasis-palm/20 grid place-items-center mb-5 shadow-glow">
           <Check size={40} className="text-oasis-palm" />
         </div>
-        <h2 className="heading text-2xl">{editing ? 'Session updated' : 'Session banked'}</h2>
-        <p className="text-sand-200/60 mt-1">The jungle drinks it in.</p>
+        <h2 className="heading text-2xl">{editing ? 'Changes saved' : 'Session saved'}</h2>
+        <p className="text-sand-200/60 mt-1">Logged to your progress.</p>
       </div>
     )
   }

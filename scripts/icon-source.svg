@@ -1,63 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#123a2b"/>
-      <stop offset="55%" stop-color="#0f2c24"/>
-      <stop offset="100%" stop-color="#0a1f1c"/>
+    <radialGradient id="bg" cx="50%" cy="42%" r="70%">
+      <stop offset="0%" stop-color="#123a2c"/>
+      <stop offset="60%" stop-color="#0c281f"/>
+      <stop offset="100%" stop-color="#06120d"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff3cf"/>
+      <stop offset="38%" stop-color="#f6d488"/>
+      <stop offset="70%" stop-color="#e0b251"/>
+      <stop offset="100%" stop-color="#b07d2c"/>
     </linearGradient>
     <radialGradient id="sun" cx="50%" cy="42%" r="55%">
-      <stop offset="0%" stop-color="#fff0c4"/>
-      <stop offset="55%" stop-color="#f6c45a"/>
-      <stop offset="100%" stop-color="#e09a35"/>
+      <stop offset="0%" stop-color="#fff5da"/>
+      <stop offset="55%" stop-color="#f6d488"/>
+      <stop offset="100%" stop-color="#cf9c3c"/>
     </radialGradient>
     <radialGradient id="glow" cx="50%" cy="42%" r="50%">
-      <stop offset="0%" stop-color="#ffd970" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#ffd970" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#f6d488" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#f6d488" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#5fe6e0"/>
-      <stop offset="55%" stop-color="#1aa6bd"/>
-      <stop offset="100%" stop-color="#0c6f7e"/>
-    </linearGradient>
-    <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f0d488"/>
-      <stop offset="100%" stop-color="#b88f44"/>
-    </linearGradient>
-    <linearGradient id="frond" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#3fb574"/>
-      <stop offset="100%" stop-color="#176945"/>
-    </linearGradient>
   </defs>
 
   <rect width="512" height="512" fill="url(#bg)"/>
-  <circle cx="256" cy="210" r="230" fill="url(#glow)"/>
+  <circle cx="256" cy="214" r="180" fill="url(#glow)"/>
 
-  <!-- jungle canopy silhouette behind -->
-  <path d="M0 300 Q 90 200 180 250 Q 256 190 332 250 Q 420 200 512 290 L512 360 L0 360 Z" fill="#0f3d2e"/>
+  <!-- crest rings -->
+  <circle cx="256" cy="256" r="228" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.95"/>
+  <circle cx="256" cy="256" r="214" fill="none" stroke="url(#gold)" stroke-width="1.4" opacity="0.4"/>
 
-  <!-- sun -->
-  <circle cx="256" cy="206" r="92" fill="url(#sun)"/>
+  <!-- sun disc -->
+  <circle cx="256" cy="206" r="44" fill="url(#sun)"/>
+  <circle cx="256" cy="206" r="52" fill="none" stroke="url(#gold)" stroke-width="1.4" opacity="0.5"/>
 
-  <!-- turquoise sea + golden beach -->
-  <rect x="0" y="356" width="512" height="70" fill="url(#sea)"/>
-  <path d="M0 410 Q 256 388 512 410 L512 512 L0 512 Z" fill="url(#sand)"/>
+  <!-- refined palm: thin gold linework -->
+  <g fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round">
+    <path d="M256 372 C 252 320 250 286 252 250"/>
+  </g>
+  <g fill="none" stroke="url(#gold)" stroke-width="5" stroke-linecap="round">
+    <path d="M252 250 C 214 232 182 232 150 248"/>
+    <path d="M252 250 C 226 220 200 206 168 204"/>
+    <path d="M252 250 C 244 218 240 196 244 168"/>
+    <path d="M252 250 C 290 232 322 232 354 248"/>
+    <path d="M252 250 C 278 220 304 206 336 204"/>
+    <path d="M252 250 C 262 220 270 200 286 176"/>
+  </g>
+  <circle cx="252" cy="250" r="6" fill="url(#gold)"/>
 
-  <!-- bold filled palm -->
-  <g>
-    <!-- trunk -->
-    <path d="M236 430 C 244 360 250 300 250 232 L 270 232 C 270 300 268 364 280 430 Z" fill="#6b4a2a"/>
-    <!-- fronds -->
-    <g fill="url(#frond)" stroke="#0f4730" stroke-width="3">
-      <path d="M260 232 q -120 -34 -176 18 q 96 -20 176 6 Z"/>
-      <path d="M260 232 q -96 -70 -170 -64 q 86 12 170 40 Z"/>
-      <path d="M260 232 q -34 -98 -8 -168 q -16 80 8 168 Z"/>
-      <path d="M260 232 q 120 -34 176 18 q -96 -20 -176 6 Z"/>
-      <path d="M260 232 q 96 -70 170 -64 q -86 12 -170 40 Z"/>
-      <path d="M260 232 q 44 -92 116 -118 q -78 38 -116 118 Z"/>
-    </g>
-    <circle cx="260" cy="232" r="13" fill="#176945"/>
-    <!-- coconuts -->
-    <circle cx="246" cy="246" r="9" fill="#4a2f18"/>
-    <circle cx="274" cy="246" r="9" fill="#4a2f18"/>
+  <!-- oasis water line + faint reflection -->
+  <g stroke="url(#gold)" stroke-linecap="round" fill="none">
+    <path d="M150 372 H 224 M 288 372 H 362" stroke-width="5"/>
+    <path d="M176 388 H 230 M 282 388 H 336" stroke-width="2.5" opacity="0.45"/>
   </g>
 </svg>

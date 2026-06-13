@@ -82,7 +82,7 @@ export const LEVELS: Level[] = [
   {
     id: 1,
     name: 'Foundation',
-    tagline: 'Build the base. Earn your first patch of green.',
+    tagline: 'Build the base. Lock in clean reps.',
     exit: { pullups: 8, dips: 10, pushups: 35, plankSec: 90, text: '8 pullups / 10 dips / 35 pushups / 90s plank' },
     blocks: [
       {
@@ -118,7 +118,7 @@ export const LEVELS: Level[] = [
   {
     id: 2,
     name: 'Strength Base',
-    tagline: 'Volume climbs. Muscle-up groundwork begins.',
+    tagline: 'Stack volume. Begin the muscle-up groundwork.',
     exit: { pullups: 12, dips: 15, pushups: 45, plankSec: 120, text: '12 pullups / 15 dips / 45 pushups / 2 min plank' },
     blocks: [
       {

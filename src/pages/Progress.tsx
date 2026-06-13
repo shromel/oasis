@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Trash2, Plus, ClipboardCheck } from 'lucide-react'
 import { useStore, baselineValues, bestFor } from '../store/useStore'
-import { RETEST_BATTERY } from '../data/program'
+import { RETEST_BATTERY, getLevel } from '../data/program'
 
 const SERIES = [
   { key: 'pullups', label: 'Pullups', color: '#e7b24c' },
@@ -16,6 +16,8 @@ export default function Progress() {
   const [showRetest, setShowRetest] = useState(false)
 
   const chartData = buildChartData(retests, profile.startedAt)
+  const level = getLevel(state.currentLevel)
+  const exit = level.exit as unknown as Record<string, number | undefined>
 
   return (
     <div className="space-y-5 pt-4">
@@ -24,19 +26,37 @@ export default function Progress() {
         <p className="text-sand-200/60 text-sm mt-1">Watch the numbers climb.</p>
       </header>
 
-      {/* Current bests */}
+      {/* Current bests vs the level's exit targets */}
       <section className="glass p-5">
-        <h2 className="heading text-lg mb-4">Current bests</h2>
+        <div className="flex items-baseline justify-between mb-4">
+          <h2 className="heading text-lg">Current bests</h2>
+          <span className="text-sand-200/45 text-xs">vs Level {level.id} exit</span>
+        </div>
         <div className="grid grid-cols-2 gap-3">
-          {RETEST_BATTERY.map((r) => (
-            <div key={r.id} className="glass-soft p-3">
-              <p className="text-sand-200/55 text-xs">{r.label}</p>
-              <p className="font-display text-2xl text-sand-50 mt-1">
-                {bestFor(state, r.id)}
-                <span className="text-sm text-sand-200/50 ml-1">{r.unit === 'sec' ? 's' : ''}</span>
-              </p>
-            </div>
-          ))}
+          {RETEST_BATTERY.map((r) => {
+            const cur = bestFor(state, r.id)
+            const goal = exit[r.id]
+            const unit = r.unit === 'sec' ? 's' : ''
+            const reached = goal != null && cur >= goal
+            const pctTo = goal != null ? Math.min(100, Math.round((cur / goal) * 100)) : 0
+            return (
+              <div key={r.id} className="glass-soft p-3">
+                <p className="text-sand-200/55 text-xs">{r.label}</p>
+                <p className="font-display text-2xl mt-1">
+                  <span className={reached ? 'text-oasis-palm' : 'text-sand-50'}>{cur}{unit}</span>
+                  {goal != null && <span className="text-sm text-sand-200/45"> / {goal}{unit}</span>}
+                </p>
+                {goal != null && (
+                  <div className="h-1 rounded-full bg-sand-800/60 overflow-hidden mt-2">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${pctTo}%`, background: reached ? '#5aa469' : 'linear-gradient(90deg,#f6d488,#e7b24c)' }}
+                    />
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </section>
 
@@ -91,7 +111,7 @@ export default function Progress() {
       <section className="glass p-5">
         <h2 className="heading text-lg mb-3">History</h2>
         {sessions.length === 0 ? (
-          <p className="text-sand-200/50 text-sm py-4 text-center">No sessions yet — go bank one.</p>
+          <p className="text-sand-200/50 text-sm py-4 text-center">No sessions logged yet.</p>
         ) : (
           <ul className="space-y-2.5">
             {sessions.slice(0, 30).map((s) => {

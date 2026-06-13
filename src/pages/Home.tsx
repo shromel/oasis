@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
-import { Flame, CalendarCheck, ChevronRight, TrendingUp, Sprout } from 'lucide-react'
-import OasisScene from '../components/OasisScene'
+import { Flame, CalendarCheck, ChevronRight, TrendingUp } from 'lucide-react'
+import LevelTrajectory from '../components/LevelTrajectory'
 import ProgressRing from '../components/ProgressRing'
-import { useStore, computeStreak, sessionsThisWeek, levelProgress, bloomScore } from '../store/useStore'
+import { useStore, computeStreak, sessionsThisWeek, levelProgress, bloomScore, levelProgressSeries } from '../store/useStore'
 import { getLevel, LEVELS } from '../data/program'
 
 function greeting() {
@@ -20,6 +20,9 @@ export default function Home() {
   const week = sessionsThisWeek(sessions)
   const { pct, items } = levelProgress(state)
   const bloom = bloomScore(state)
+  const series = levelProgressSeries(state)
+  const nextLevel = Math.min(level.id + 1, LEVELS.length)
+  const trajectoryPct = series.length ? series[series.length - 1].pct : pct
 
   const today = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
 
@@ -33,15 +36,25 @@ export default function Home() {
         <p className="text-sand-200/50 text-xs">{today}</p>
       </header>
 
-      {/* Hero: slim jungle-coast banner + momentum stats */}
+      {/* Hero: log-driven trajectory toward the next level */}
       <section className="glass overflow-hidden">
-        <div className="relative h-[112px]">
-          <OasisScene growth={bloom.value} className="absolute inset-0 w-full h-full" />
-          <div className="absolute top-2.5 left-3 right-3 flex items-center justify-between">
-            <span className="chip backdrop-blur-md">Lv {level.id} · {level.name}</span>
-            <span className="chip backdrop-blur-md flex items-center gap-1">
-              <Sprout size={12} className="text-oasis-palm" /> {Math.round(bloom.value * 100)}% bloom
-            </span>
+        <div className="relative h-[132px]">
+          {series.length > 0 && <LevelTrajectory data={series} className="absolute inset-0 w-full h-full" />}
+          {/* left scrim so the numbers stay legible over the curve */}
+          <div className="absolute inset-0 bg-gradient-to-r from-sand-950/80 via-sand-950/30 to-transparent" />
+          <div className="absolute inset-0 p-4 flex flex-col justify-between">
+            <div>
+              <p className="text-sand-200/55 text-[10px] uppercase tracking-[0.18em]">
+                {series.length ? `Trajectory · Level ${nextLevel}` : level.name}
+              </p>
+              <p className="font-display text-[2.6rem] leading-none mt-1 gold-text">{trajectoryPct}%</p>
+            </div>
+            <div className="flex items-end justify-between">
+              <p className="text-sand-200/45 text-[10px]">
+                {series.length ? 'from your training logs' : level.exit.text}
+              </p>
+              <span className="chip">Lv {level.id} · {level.name}</span>
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-3 divide-x divide-sand-700/40 border-t border-sand-700/40">

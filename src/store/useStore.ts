@@ -204,12 +204,38 @@ export const baselineValues: Record<string, number> = {
   legraises: 10,
 }
 
-/** Best recorded value for a metric across baseline + all retests. */
+// Which logged exercises demonstrate each exit-criterion metric (best set ≈ that
+// day's demonstrated max). Ids are the slugified exercise names from program.ts.
+const METRIC_EXERCISES: Record<string, string[]> = {
+  pullups: ['pullups', 'chin-ups', 'weighted-pullups', 'weighted-chin-ups', 'explosive-chest-to-bar-pullups', 'pullup-volume'],
+  dips: ['dips', 'weighted-dips', 'straight-bar-dips'],
+  pushups: ['pushups', 'decline-pushups'],
+  plankSec: ['plank-elbows', 'plank'],
+}
+
+/**
+ * Best demonstrated value for a metric across baseline, retests, AND logged
+ * sessions (best set of any exercise that demonstrates the metric). Baseline is
+ * a floor, so low-rep/high-set logging can never drag the estimate below your
+ * starting test. Keeps the hero trajectory, the level ring, and the Progress
+ * "current bests" all consistent.
+ */
 export function bestFor(state: OasisState, metric: string): number {
   let best = baselineValues[metric] ?? 0
   for (const r of state.retests) {
     const v = r.values[metric]
     if (typeof v === 'number' && v > best) best = v
+  }
+  const ids = METRIC_EXERCISES[metric]
+  if (ids) {
+    for (const s of state.sessions) {
+      for (const e of s.entries) {
+        if (ids.includes(e.exerciseId) && e.sets.length) {
+          const m = Math.max(...e.sets)
+          if (m > best) best = m
+        }
+      }
+    }
   }
   return best
 }
@@ -253,6 +279,65 @@ export function todaySessionForBlock(sessions: Session[], blockId: string): Sess
 
 const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0)
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
+
+export interface ProgressPoint {
+  date: string
+  pct: number
+  label: string
+}
+
+/**
+ * Trajectory toward the current level's exit, **derived from your logs** (best
+ * set per metric, accumulated as running personal bests, also folding in
+ * baseline + retests). Distinct from the Progress-tab strength curve, which
+ * plots raw retest numbers. Empty for levels whose exit isn't numeric (L3/L4).
+ */
+export function levelProgressSeries(state: OasisState): ProgressPoint[] {
+  const lvl = getLevel(state.currentLevel)
+  const exit = lvl.exit as unknown as Record<string, number | undefined>
+  const metrics = ['pullups', 'dips', 'pushups', 'plankSec'].filter((m) => exit[m] != null)
+  if (metrics.length === 0) return []
+
+  type Ev = { time: number; date: string; metric: string; value: number }
+  const events: Ev[] = []
+  const startTime = new Date(state.profile.startedAt).getTime()
+  for (const m of metrics) {
+    events.push({ time: startTime, date: state.profile.startedAt, metric: m, value: baselineValues[m] ?? 0 })
+  }
+  for (const s of state.sessions) {
+    for (const e of s.entries) {
+      if (!e.sets.length) continue
+      const metric = metrics.find((m) => METRIC_EXERCISES[m]?.includes(e.exerciseId))
+      if (!metric) continue
+      events.push({ time: new Date(s.date).getTime(), date: s.date, metric, value: Math.max(...e.sets) })
+    }
+  }
+  for (const r of state.retests) {
+    for (const m of metrics) {
+      const v = r.values[m]
+      if (typeof v === 'number') events.push({ time: new Date(r.date).getTime(), date: r.date, metric: m, value: v })
+    }
+  }
+  events.sort((a, b) => a.time - b.time)
+
+  const best: Record<string, number> = {}
+  for (const m of metrics) best[m] = baselineValues[m] ?? 0
+  const out: ProgressPoint[] = []
+  for (const ev of events) {
+    best[ev.metric] = Math.max(best[ev.metric] ?? 0, ev.value)
+    const pct = Math.round(
+      (metrics.reduce((a, m) => a + Math.min(best[m] / (exit[m] as number), 1), 0) / metrics.length) * 100,
+    )
+    const label = new Date(ev.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    const k = dayKey(ev.date)
+    if (out.length && dayKey(out[out.length - 1].date) === k) {
+      out[out.length - 1] = { date: ev.date, pct, label }
+    } else {
+      out.push({ date: ev.date, pct, label })
+    }
+  }
+  return out
+}
 
 /**
  * "Bloom" — how lush the oasis is. Driven mainly by *training momentum* read

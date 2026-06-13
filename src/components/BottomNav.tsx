@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { Sun, Dumbbell, Apple, TrendingUp, User } from 'lucide-react'
+import { Home as HomeIcon, Dumbbell, Apple, TrendingUp, User } from 'lucide-react'
 
 const items = [
-  { to: '/', label: 'Oasis', icon: Sun, end: true },
+  { to: '/', label: 'Home', icon: HomeIcon, end: true },
   { to: '/train', label: 'Train', icon: Dumbbell },
   { to: '/nourish', label: 'Nourish', icon: Apple },
   { to: '/progress', label: 'Progress', icon: TrendingUp },
