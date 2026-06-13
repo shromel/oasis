@@ -24,6 +24,21 @@ A crossover of **Hevy (training)** × **Cronometer (nutrition)** with a "golden 
 - Pages: **Oasis** (dashboard: scene, streak, level-exit rings), **Train** (level browser + blocks + warm-up), **SessionLogger** (per-set steppers, mark-done, auto-progression on save), **Progress** (current bests, strength curve chart, 4-week retest form, history), **Nourish** (placeholder previewing nutrition), **You** (profile, level control, export/import, reset).
 - Auto-progression rule implemented: hit target top across all sets 2 sessions in a row → target +1.
 
+## ✅ Done (v1.1 — Home redesign + theme overhaul, 2026-06-14)
+- **Home compressed to one screen**; the scene is now a slim banner (`h-[112px]`), not a giant block. 3-stat row: streak / this week / **momentum**.
+- **"Bloom" is now log-based** → `bloomScore(state)` in the store: per-exercise volume trend (earliest→recent sessions) = "momentum", blended 60/40 with journey progress; falls back to journey before there are ≥2 sessions of an exercise. Drives `OasisScene` growth and shows a momentum % on the dashboard. **(supersedes the old "growth = level+exit%+streak")**
+- **Theme → bold Brazilian jungle & coast** (kept the dark-gold + lush-green soul): `OasisScene.tsx` rebuilt from **solid filled shapes** (canopy mounds, palms with real fronds, big leaves, foliage bushes, turquoise sea, golden beach, fireflies) — no more thin line-art. Background palette in `index.css` shifted to saturated emerald + turquoise + gold.
+- **New bolder app icon + favicon** (`scripts/icon-source.svg` → `gen-icons.cjs`; `public/favicon.svg`). PNG icons now in manifest.
+- **Same-day lock + edit**: a block already logged today shows "✓ Done today" + **Edit** (not Start) in `Train.tsx`; `SessionLogger` blocks duplicate same-day logging (lock screen → Edit) and supports editing via `?edit=<sessionId>`, prefilling saved sets. Store gained `updateSession()`, and selectors `dayKey()`, `todaySessionForBlock()`.
+
+## 👉 START HERE NEXT — Nourish (nutrition) kickoff
+The next session builds the **Nourish** half. A typed foundation already exists in **`src/lib/nutrition.ts`** (pure functions, no UI yet): `Food`/`FoodLog` types, `fetchOpenFoodFacts(barcode)`, `mifflinStTdee(profile)`, `rdaTargets(profile)`, `nutritionScore(totals, targets)`. First steps:
+1. Add nutrition state to the store: `foodLog: FoodLog[]`, `addFood`, `updateFoodEntry`, `removeFood`; selector `dailyTotals(date)`. Keep in localStorage for now; move to Dexie/IndexedDB only when entries get large.
+2. Build the **Nourish diary page** (replace the placeholder): meals (breakfast/lunch/dinner/snack), add-food search/manual, daily kcal + macro rings, micro list vs `rdaTargets`, the 0–100 score, and surplus/deficit vs `mifflinStTdee`.
+3. **Barcode scan**: `BarcodeDetector` API where available + `@zxing/browser` fallback for iOS Safari; `getUserMedia({video:{facingMode:'environment'}})` → barcode → `fetchOpenFoodFacts` → confirm serving → log. (Camera works in the installed PWA over HTTPS, which we have.)
+4. Then fuse nutrition score + training into the unified **Vitality** number that drives bloom (see item 5 below).
+- **Open decision still pending:** food DB = Open Food Facts only, or + USDA FoodData Central (needs free key) for better whole-food micros. Scaffold defaults to Open Food Facts.
+
 ## 🔜 Next up (priority order)
 
 ### 1. Nutrition core (the "Cronometer" half) — biggest chunk
