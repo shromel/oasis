@@ -49,7 +49,20 @@ A crossover of **Hevy (training)** × **Cronometer (nutrition)** with a "golden 
   - Train: "Your program" eyebrow header.
 - **Naming note:** the system's exported files use numeric **L1–L4 + Foundation/Strength Base/…** subtitles (per README + kit). The user's later screenshots showed botanical names (Roots/Canopy) from a newer claude.ai iteration that wasn't exported — NOT adopted (would clash with the real program). Revisit only if the user explicitly wants botanical level names.
 
-## 👉 START HERE NEXT — Nourish (nutrition) kickoff
+## ✅ Done (v0.2 — Nourish nutrition, 2026-06-14)
+- **Required onboarding questionnaire** (`pages/Onboarding.tsx`), gated in `App.tsx` via `profile.onboarded`: stats → activity → goal direction + pace + protein, with a live targets preview. Re-runnable from You ("Edit goals & targets" sets `onboarded:false`).
+- **Goal engine** `computeTargets()` in `lib/nutrition.ts`: Mifflin-St Jeor → TDEE×activity → rate-based delta (`rateKgPerWeek × 7700/7`); protein = weight×proteinPerKg, fat = weight×0.8, carbs = remainder.
+- **Store**: profile gained `activity/rateKgPerWeek/targetWeightKg/proteinPerKg/onboarded`; nutrition slice `foodLog/savedFoods/savedMeals` + actions + `dailyTotals/foodLogForDay/isSavedFood`. Persist + export/import updated. Migration-safe (existing users keep data; missing fields default; onboarding re-prompts).
+- **Nourish diary**: calorie ring + macro bars vs targets, surplus/deficit, meals (breakfast/lunch/dinner/snack), per-item edit/delete, "save as meal".
+- **AddFood** (`/nourish/add?meal=`): Search / Saved (foods + one-tap saved meals) / Manual / Scan, with a serving sheet. Verified manual→diary end-to-end in preview.
+- **Open Food Facts**: barcode lookup via `api/v2/product` (CORS-OK, verified 200 in-browser). Text search via `api/v2/search` (the legacy `cgi/search.pl` and `search.openfoodfacts.org` are CORS-blocked in-browser). **OFF rate-limits search by IP** → search degrades gracefully with a Retry; barcode + manual + saved are the reliable paths.
+
+### Nutrition — still to do (next passes)
+- **Barcode camera** needs testing on the real iPhone (can't exercise the camera in the preview sandbox); logic uses `@zxing/browser` + `getUserMedia({facingMode:'environment'})`, works in the installed PWA over HTTPS.
+- **Full micros** (Cronometer-style vitamins/minerals vs RDA + micro-weighted score) — deferred from v0.2 (`rdaTargets`/`nutritionScore` scaffolds already in `lib/nutrition.ts`).
+- Date navigation in the diary (currently today only); bodyweight log overlay vs calorie balance; weekly review.
+
+## 👉 (was) Nourish kickoff — superseded by v0.2 above
 The next session builds the **Nourish** half. A typed foundation already exists in **`src/lib/nutrition.ts`** (pure functions, no UI yet): `Food`/`FoodLog` types, `fetchOpenFoodFacts(barcode)`, `mifflinStTdee(profile)`, `rdaTargets(profile)`, `nutritionScore(totals, targets)`. First steps:
 1. Add nutrition state to the store: `foodLog: FoodLog[]`, `addFood`, `updateFoodEntry`, `removeFood`; selector `dailyTotals(date)`. Keep in localStorage for now; move to Dexie/IndexedDB only when entries get large.
 2. Build the **Nourish diary page** (replace the placeholder): meals (breakfast/lunch/dinner/snack), add-food search/manual, daily kcal + macro rings, micro list vs `rdaTargets`, the 0–100 score, and surplus/deficit vs `mifflinStTdee`.
