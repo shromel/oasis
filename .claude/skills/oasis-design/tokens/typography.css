@@ -1,0 +1,56 @@
+/* ============================================================
+   OASIS — TYPOGRAPHY TOKENS
+   Display: Fraunces (optical serif) — elegant, serious, warm.
+   Text:    Inter — quiet, legible, modern.
+   ============================================================ */
+
+:root {
+  /* --- Families --- */
+  --font-display: 'Fraunces', 'Georgia', 'Times New Roman', serif;
+  --font-sans:    'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* --- Weights --- */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* --- Type scale (px) ---
+     Display sizes use Fraunces; body & labels use Inter. */
+  --text-display:  2.6rem;   /* 41.6px — hero stat numbers */
+  --text-h1:       1.875rem; /* 30px — page titles */
+  --text-h2:       1.25rem;  /* 20px — section headings */
+  --text-h3:       1.125rem; /* 18px — card headings */
+  --text-lg:       1.0625rem;/* 17px */
+  --text-base:     0.95rem;  /* ~15px — body default */
+  --text-sm:       0.875rem; /* 14px */
+  --text-xs:       0.75rem;  /* 12px — captions, chips */
+  --text-2xs:      0.625rem; /* 10px — eyebrows, stat labels */
+
+  /* --- Line heights --- */
+  --leading-none:  1;
+  --leading-tight: 1.15;
+  --leading-snug:  1.35;
+  --leading-body:  1.55;
+
+  /* --- Tracking ---
+     Display sets tight; eyebrows/labels set wide & uppercase. */
+  --tracking-display: -0.02em;
+  --tracking-tight:   -0.01em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.08em;
+  --tracking-eyebrow: 0.18em;
+
+  /* === SEMANTIC ROLES ======================================== */
+  /* Eyebrow — the 10px uppercase gold-muted label above stats. */
+  --role-eyebrow-size:     var(--text-2xs);
+  --role-eyebrow-tracking: var(--tracking-eyebrow);
+  --role-eyebrow-weight:   var(--weight-medium);
+}
+
+/* === Optical sizing for Fraunces === */
+.font-display,
+[class*="heading"] {
+  font-optical-sizing: auto;
+}

@@ -1,0 +1,57 @@
+<!-- @dsCard group="Components" viewport="700x300" name="Surfaces — GlassCard · StatTile" subtitle="The frosted panel and the dashboard stat row." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--grad-atmosphere); background-color: #0a130f; font-family: var(--font-sans); }
+  #root { padding: 22px 24px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { GlassCard, StatTile } = window.OasisDesignSystem_2f48a5;
+    const I = ({ n, size = 15 }) => <i data-lucide={n} style={{ width: size, height: size }} />;
+
+    function Demo() {
+      React.useEffect(() => { window.lucide && window.lucide.createIcons(); });
+      return (
+        <React.Fragment>
+          <GlassCard style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '16px 18px' }}>
+              <span className="eyebrow">Today</span>
+              <h2 className="heading" style={{ fontSize: '1.25rem', margin: '4px 0 2px' }}>Start a session</h2>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Outdoor bar · Home floor</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', borderTop: '1px solid var(--border-hairline)' }}>
+              <div style={{ borderRight: '1px solid var(--border-soft)' }}>
+                <StatTile icon={<I n="flame" />} accent="var(--dusk-rose)" value="7" label="streak" />
+              </div>
+              <div style={{ borderRight: '1px solid var(--border-soft)' }}>
+                <StatTile icon={<I n="calendar-check" />} accent="var(--oasis-palm)" value="3" label="this week" />
+              </div>
+              <StatTile icon={<I n="trending-up" />} accent="var(--gold)" value="+12%" label="momentum" />
+            </div>
+          </GlassCard>
+
+          <GlassCard soft>
+            <span className="eyebrow">Nested · soft</span>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', margin: '6px 0 0', color: 'var(--text-primary)' }}>
+              <span className="gold-text">68%</span>
+            </p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '2px 0 0' }}>toward Level 2</p>
+          </GlassCard>
+        </React.Fragment>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+  </script>
+</body>
+</html>

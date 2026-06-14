@@ -1,0 +1,26 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Shadows — depth & glow" subtitle="A near-black depth shadow under glass; a warm gold halo for active/success." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--grad-atmosphere); background-color: #0a130f; font-family: var(--font-sans); color: var(--text-body); }
+  .wrap { padding: 28px 24px; display: flex; gap: 22px; }
+  .sw { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .box { width: 100%; height: 72px; border-radius: 18px; display: grid; place-items: center; }
+  .card { background: var(--surface-card); border: 1px solid var(--border-hairline); box-shadow: var(--shadow-card); backdrop-filter: blur(12px); }
+  .glow { background: var(--surface-card); border: 1px solid var(--border-gold); box-shadow: var(--shadow-glow); }
+  .gold { background: var(--grad-gold); box-shadow: var(--shadow-gold); color: var(--text-on-gold); font-weight: 600; }
+  .n { font-size: 11px; color: var(--text-secondary); }
+  .px { font-size: 9px; color: var(--text-faint); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="sw"><div class="box card"></div><span class="n">--shadow-card</span><span class="px">depth · under glass</span></div>
+    <div class="sw"><div class="box glow"></div><span class="n">--shadow-glow</span><span class="px">halo · active / success</span></div>
+    <div class="sw"><div class="box gold">Start</div><span class="n">--shadow-gold</span><span class="px">under gold buttons</span></div>
+  </div>
+</body>
+</html>

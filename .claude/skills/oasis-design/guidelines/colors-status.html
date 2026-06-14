@@ -1,0 +1,25 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Semantic status" subtitle="Success · warning · danger · info — mapped onto the earthy palette." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: #100a06; font-family: var(--font-sans); color: var(--text-body); }
+  .wrap { padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .sw { display: flex; align-items: center; gap: 11px; padding: 12px; border-radius: 12px; background: var(--surface-card); border: 1px solid var(--border-hairline); }
+  .dot { width: 26px; height: 26px; border-radius: 999px; flex: 0 0 auto; }
+  .t { display: flex; flex-direction: column; }
+  .name { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+  .h { font-size: 10px; color: var(--text-faint); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="sw"><span class="dot" style="background:var(--status-success)"></span><span class="t"><span class="name">Success</span><span class="h">#5aa469</span></span></div>
+    <div class="sw"><span class="dot" style="background:var(--status-warning)"></span><span class="t"><span class="name">Warning</span><span class="h">#e7b24c</span></span></div>
+    <div class="sw"><span class="dot" style="background:var(--status-danger)"></span><span class="t"><span class="name">Danger</span><span class="h">#d98a6a</span></span></div>
+    <div class="sw"><span class="dot" style="background:var(--status-info)"></span><span class="t"><span class="name">Info</span><span class="h">#4cc4d4</span></span></div>
+  </div>
+</body>
+</html>

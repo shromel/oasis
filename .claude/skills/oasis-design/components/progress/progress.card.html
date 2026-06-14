@@ -1,0 +1,53 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Progress — Ring · CriterionBar · LevelPill · Stepper" subtitle="The achievement ring, goal bars, level selector and per-set steppers." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--grad-atmosphere); background-color: #0a130f; font-family: var(--font-sans); }
+  #root { padding: 22px 24px; display: flex; flex-direction: column; gap: 18px; }
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .lower { display: flex; gap: 22px; align-items: center; }
+  .bars { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .sets { display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { ProgressRing, CriterionBar, LevelPill, Stepper } = window.OasisDesignSystem_2f48a5;
+
+    function Demo() {
+      const [sets, setSets] = React.useState([8, 7, 6]);
+      const upd = (i, v) => setSets(s => s.map((x, j) => j === i ? v : x));
+      return (
+        <React.Fragment>
+          <div className="pills">
+            <LevelPill level={1} name="Foundation" current active />
+            <LevelPill level={2} name="Strength" />
+            <LevelPill level={3} name="Muscle-up" />
+          </div>
+          <div className="lower">
+            <ProgressRing value={68} label="68%" sublabel="exit" size={92} />
+            <div className="bars">
+              <CriterionBar label="Max strict pullups" current={6} goal={8} />
+              <CriterionBar label="Dips" current={12} goal={12} />
+              <CriterionBar label="Hollow hold" current={35} goal={45} unit="s" />
+            </div>
+          </div>
+          <div className="sets">
+            {sets.map((v, i) => <Stepper key={i} index={i + 1} value={v} onChange={nv => upd(i, nv)} />)}
+            <Stepper index={4} value={30} unit="s" onChange={() => {}} />
+          </div>
+        </React.Fragment>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+  </script>
+</body>
+</html>

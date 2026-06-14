@@ -1,0 +1,58 @@
+<!-- @dsCard group="Components" viewport="700x320" name="Core — Button · Chip · IconTile" subtitle="The action & metadata primitives across gold / ghost / status tones." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--grad-atmosphere); background-color: #0a130f; font-family: var(--font-sans); }
+  #root { padding: 22px 24px; }
+  .group { display: flex; flex-direction: column; gap: 14px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .lbl { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); width: 100%; margin-bottom: -4px; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { Button, Chip, IconTile } = window.OasisDesignSystem_2f48a5;
+    const I = ({ n, size = 16 }) => <i data-lucide={n} style={{ width: size, height: size }} />;
+
+    function Demo() {
+      React.useEffect(() => { window.lucide && window.lucide.createIcons(); });
+      return (
+        <div className="group">
+          <div className="row">
+            <span className="lbl">Buttons</span>
+            <Button variant="gold" icon={<I n="play" />}>Start</Button>
+            <Button variant="ghost" icon={<I n="pencil" />}>Edit</Button>
+            <Button variant="text" iconRight={<I n="chevron-right" />}>details</Button>
+            <Button variant="gold" size="sm">Save</Button>
+            <Button variant="gold" disabled>Disabled</Button>
+          </div>
+          <div className="row">
+            <span className="lbl">Chips</span>
+            <Chip>3×8–12</Chip>
+            <Chip active>L1 · Outdoor</Chip>
+            <Chip tone="success" icon={<I n="check" size={12} />}>Done today</Chip>
+            <Chip tone="info">+12% momentum</Chip>
+            <Chip tone="danger">deficit</Chip>
+          </div>
+          <div className="row">
+            <span className="lbl">Icon tiles</span>
+            <IconTile tone="gold" glow><I n="scan-barcode" size={22} /></IconTile>
+            <IconTile><I n="dumbbell" size={20} /></IconTile>
+            <IconTile tone="success"><I n="check" size={20} /></IconTile>
+          </div>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+  </script>
+</body>
+</html>

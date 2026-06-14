@@ -1,0 +1,31 @@
+<!-- @dsCard group="Type" viewport="700x150" name="Eyebrows, labels & gold numerals" subtitle="Uppercase wide-tracked eyebrows; lowercase stat labels; gold-clip numerals." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: #0c1410; font-family: var(--font-sans); color: var(--text-body); }
+  .wrap { padding: 22px 24px; display: flex; gap: 40px; align-items: center; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .num { font-family: var(--font-display); font-size: 3rem; line-height: 1; letter-spacing: -0.02em; }
+  .label { font-size: 10px; color: var(--text-muted); }
+  .meta { font-size: 10px; color: var(--text-faint); font-family: var(--font-mono); margin-top: 4px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="col">
+      <span class="eyebrow">Trajectory · Level 2</span>
+      <span class="num gold-text">68%</span>
+      <span class="label">momentum</span>
+    </div>
+    <div class="col">
+      <span class="eyebrow">Today</span>
+      <span class="eyebrow" style="color:var(--text-gold)">Start a session</span>
+      <span class="meta">eyebrow · 10px · UPPER · tracking 0.18em</span>
+      <span class="meta">numerals use --grad-gold-text clip</span>
+    </div>
+  </div>
+</body>
+</html>

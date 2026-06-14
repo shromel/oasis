@@ -1,0 +1,11 @@
+/* ============================================================
+   OASIS — WEBFONTS
+   The brand ships two Google-hosted families:
+     · Fraunces (variable optical serif) — display
+     · Inter — text / UI
+   Loaded from the Google Fonts CDN, exactly as the product does.
+   (See README → "Font substitution" if you need bundled binaries
+   for an offline build.)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');

@@ -1,0 +1,24 @@
+<!-- @dsCard group="Spacing" viewport="700x150" name="Spacing scale" subtitle="4px base. 12px between cards, 16–20px inside them." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: #100a06; font-family: var(--font-sans); color: var(--text-body); }
+  .wrap { padding: 22px 24px; display: flex; gap: 14px; align-items: flex-end; }
+  .sw { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .bar { width: 22px; background: var(--grad-gold); border-radius: 4px; }
+  .n { font-size: 10px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="wrap" id="w"></div>
+  <script>
+    const tokens = [['1','4'],['2','8'],['3','12'],['4','16'],['5','20'],['6','24'],['8','32'],['10','40'],['12','48']];
+    document.getElementById('w').innerHTML = tokens.map(([k,px]) =>
+      `<div class="sw"><div class="bar" style="height:${px}px"></div><span class="n">${px}</span></div>`
+    ).join('');
+  </script>
+</body>
+</html>

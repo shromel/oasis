@@ -32,13 +32,15 @@ body {
   position: fixed;
   inset: 0;
   z-index: -2;
+  /* matches the oasis-design token --grad-atmosphere */
   background:
-    radial-gradient(135% 80% at 50% -10%, rgba(246, 196, 90, 0.20) 0%, rgba(246, 196, 90, 0) 44%),
-    radial-gradient(80% 58% at 10% 28%, rgba(47, 158, 99, 0.22) 0%, rgba(47, 158, 99, 0) 55%),
-    radial-gradient(80% 58% at 90% 24%, rgba(31, 122, 82, 0.20) 0%, rgba(31, 122, 82, 0) 55%),
-    radial-gradient(135% 85% at 50% 115%, rgba(26, 166, 189, 0.24) 0%, rgba(26, 166, 189, 0) 60%),
+    radial-gradient(135% 80% at 50% -10%, rgba(246, 196, 90, 0.22) 0%, rgba(246, 196, 90, 0) 46%),
+    radial-gradient(86% 60% at 8% 30%, rgba(120, 142, 72, 0.16) 0%, rgba(120, 142, 72, 0) 55%),
+    radial-gradient(82% 58% at 92% 22%, rgba(63, 122, 74, 0.14) 0%, rgba(63, 122, 74, 0) 55%),
+    radial-gradient(120% 70% at 50% 92%, rgba(148, 104, 56, 0.20) 0%, rgba(148, 104, 56, 0) 55%),
+    radial-gradient(135% 85% at 50% 118%, rgba(26, 166, 189, 0.16) 0%, rgba(26, 166, 189, 0) 58%),
     radial-gradient(120% 120% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.6) 100%),
-    linear-gradient(180deg, #14160d 0%, #0d150f 46%, #0a130f 100%);
+    linear-gradient(180deg, #161509 0%, #11140d 46%, #0c120e 100%);
 }
 
 /* faint sand grain */
@@ -78,6 +80,12 @@ body {
   }
   .chip {
     @apply text-xs font-medium px-2.5 py-1 rounded-full bg-sand-800/50 border border-sand-600/40 text-sand-100/80;
+  }
+  .eyebrow {
+    @apply text-[10px] uppercase tracking-[0.18em] font-medium text-sand-200/50;
+  }
+  .input {
+    @apply w-full bg-sand-800/40 border border-sand-600/40 rounded-xl px-3 py-2.5 text-sand-50 outline-none transition focus:border-gold/50 placeholder:text-sand-200/35;
   }
 }
 

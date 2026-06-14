@@ -1,0 +1,37 @@
+<!-- @dsCard group="Brand" viewport="700x210" name="Glass material" subtitle="Frosted panels over the landscape — the system's core surface." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; font-family: var(--font-sans); color: var(--text-body);
+    background: var(--grad-atmosphere); background-color: #0a130f; }
+  .wrap { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .glass, .glass-soft { padding: 18px; }
+  .e { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
+  .h { font-family: var(--font-display); font-size: 1.25rem; color: var(--text-primary); letter-spacing: -0.01em; margin: 6px 0 2px; }
+  .s { font-size: 0.8rem; color: var(--text-secondary); }
+  .meta { font-size: 9px; color: var(--text-faint); font-family: var(--font-mono); margin-top: 12px; }
+  .inner { margin-top: 12px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="glass">
+      <div class="e">Today</div>
+      <div class="h">Start a session</div>
+      <div class="s">Outdoor bar · Home floor</div>
+      <div class="meta">.glass · radius 28 · blur-xl · hairline</div>
+    </div>
+    <div class="glass">
+      <div class="e">Nested</div>
+      <div class="glass-soft inner" style="padding:12px">
+        <div class="s" style="color:var(--text-primary);font-weight:500">Max pullups</div>
+        <div class="s">6 / 8</div>
+      </div>
+      <div class="meta">.glass-soft · radius 24 · blur-md</div>
+    </div>
+  </div>
+</body>
+</html>

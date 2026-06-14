@@ -1,0 +1,27 @@
+<!-- @dsCard group="Spacing" viewport="700x160" name="Radii" subtitle="Everything soft. Buttons 20 · inputs 12 · cards 28 · chips pill." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: #100a06; font-family: var(--font-sans); color: var(--text-body); }
+  .wrap { padding: 22px 24px; display: flex; gap: 14px; align-items: flex-end; }
+  .sw { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .box { width: 60px; height: 60px; background: var(--surface-raised); border: 1px solid var(--border-hairline); border-top: 2px solid var(--gold); }
+  .n { font-size: 10px; color: var(--text-secondary); }
+  .px { font-size: 9px; color: var(--text-faint); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="sw"><div class="box" style="border-radius:var(--radius-sm)"></div><span class="n">sm</span><span class="px">8</span></div>
+    <div class="sw"><div class="box" style="border-radius:var(--radius-md)"></div><span class="n">md</span><span class="px">12</span></div>
+    <div class="sw"><div class="box" style="border-radius:var(--radius-lg)"></div><span class="n">lg</span><span class="px">16</span></div>
+    <div class="sw"><div class="box" style="border-radius:var(--radius-xl)"></div><span class="n">xl · btn</span><span class="px">20</span></div>
+    <div class="sw"><div class="box" style="border-radius:var(--radius-2xl)"></div><span class="n">2xl</span><span class="px">24</span></div>
+    <div class="sw"><div class="box" style="border-radius:var(--radius-3xl)"></div><span class="n">3xl · card</span><span class="px">28</span></div>
+    <div class="sw"><div class="box" style="border-radius:var(--radius-pill)"></div><span class="n">pill</span><span class="px">∞</span></div>
+  </div>
+</body>
+</html>

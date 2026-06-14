@@ -1,0 +1,29 @@
+<!-- @dsCard group="Brand" viewport="700x190" name="Atmosphere & grain" subtitle="The fixed world behind everything: golden sun, emerald jungle, turquoise coast." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  html, body { height: 100%; margin: 0; }
+  body { font-family: var(--font-sans); color: var(--text-body); }
+  .stage { position: relative; min-height: 190px; }
+  .stage::before { content: ''; position: absolute; inset: 0; background: var(--grad-atmosphere); }
+  .stage::after { content: ''; position: absolute; inset: 0; opacity: 0.05; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .label { position: absolute; left: 24px; bottom: 22px; z-index: 2; }
+  .label .e { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
+  .label .t { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: -0.02em; color: var(--text-primary); margin-top: 2px; }
+  .label .m { font-size: 10px; color: var(--text-faint); font-family: var(--font-mono); margin-top: 8px; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="label">
+      <div class="e">The world behind everything</div>
+      <div class="t">A golden oasis rising from the barrens</div>
+      <div class="m">--grad-atmosphere + 4–5% SVG sand grain · .oasis-atmosphere</div>
+    </div>
+  </div>
+</body>
+</html>

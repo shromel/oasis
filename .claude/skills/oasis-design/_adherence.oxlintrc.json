@@ -1,0 +1,372 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/core/**",
+              "components/progress/**",
+              "components/surfaces/**",
+              "ui_kits/oasis-app/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Fraunces|Inter))/i]",
+        "message": "Font not provided by the design system. Available: Fraunces, Inter."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|icon|iconRight|fullWidth|disabled|type|onClick|children|style|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, icon, iconRight, fullWidth, disabled, type, onClick, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:gold|ghost|text)$/]",
+        "message": "<Button> variant must be one of 'gold' | 'ghost' | 'text'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Button> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='type'] > Literal[value!=/^(?:button|submit|reset)$/]",
+        "message": "<Button> type must be one of 'button' | 'submit' | 'reset'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Chip'] > JSXAttribute > JSXIdentifier[name!=/^(?:tone|active|icon|children|style|key|ref|className|style|children)$/]",
+        "message": "<Chip> doesn't accept that prop. Declared props: tone, active, icon, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Chip'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:neutral|gold|success|info|danger)$/]",
+        "message": "<Chip> tone must be one of 'neutral' | 'gold' | 'success' | 'info' | 'danger'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CriterionBar'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|current|goal|unit|style|key|ref|className|style|children)$/]",
+        "message": "<CriterionBar> doesn't accept that prop. Declared props: label, current, goal, unit, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='GlassCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:soft|interactive|as|padding|children|style|key|ref|className|style|children)$/]",
+        "message": "<GlassCard> doesn't accept that prop. Declared props: soft, interactive, as, padding, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='IconTile'] > JSXAttribute > JSXIdentifier[name!=/^(?:tone|size|glow|children|style|key|ref|className|style|children)$/]",
+        "message": "<IconTile> doesn't accept that prop. Declared props: tone, size, glow, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='IconTile'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:sunken|gold|success)$/]",
+        "message": "<IconTile> tone must be one of 'sunken' | 'gold' | 'success'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='LevelPill'] > JSXAttribute > JSXIdentifier[name!=/^(?:level|name|active|current|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<LevelPill> doesn't accept that prop. Declared props: level, name, active, current, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ProgressRing'] > JSXAttribute > JSXIdentifier[name!=/^(?:value|size|stroke|label|sublabel|className|style|key|ref|className|style|children)$/]",
+        "message": "<ProgressRing> doesn't accept that prop. Declared props: value, size, stroke, label, sublabel, className, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatTile'] > JSXAttribute > JSXIdentifier[name!=/^(?:icon|value|label|accent|style|key|ref|className|style|children)$/]",
+        "message": "<StatTile> doesn't accept that prop. Declared props: icon, value, label, accent, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Stepper'] > JSXAttribute > JSXIdentifier[name!=/^(?:index|value|unit|onChange|style|key|ref|className|style|children)$/]",
+        "message": "<Stepper> doesn't accept that prop. Declared props: index, value, unit, onChange, style."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Button": {
+        "replaces": []
+      },
+      "Chip": {
+        "replaces": []
+      },
+      "CriterionBar": {
+        "replaces": []
+      },
+      "GlassCard": {
+        "replaces": []
+      },
+      "IconTile": {
+        "replaces": []
+      },
+      "LevelPill": {
+        "replaces": []
+      },
+      "ProgressRing": {
+        "replaces": []
+      },
+      "StatTile": {
+        "replaces": []
+      },
+      "Stepper": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--app-max-width",
+      "--bg-base",
+      "--blur-card",
+      "--blur-soft",
+      "--border-gold",
+      "--border-hairline",
+      "--border-soft",
+      "--border-strong",
+      "--cavern-deep",
+      "--cavern-fern",
+      "--cavern-glow",
+      "--cavern-moss",
+      "--cavern-pool",
+      "--cavern-stone",
+      "--dur-base",
+      "--dur-fast",
+      "--dur-slow",
+      "--dusk-rose",
+      "--dusk-violet",
+      "--ease-out",
+      "--ease-spring",
+      "--font-display",
+      "--font-mono",
+      "--font-sans",
+      "--gold",
+      "--gold-deep",
+      "--gold-light",
+      "--gold-pale",
+      "--grad-atmosphere",
+      "--grad-gold",
+      "--grad-gold-foil",
+      "--grad-gold-text",
+      "--grad-ring",
+      "--leading-body",
+      "--leading-none",
+      "--leading-snug",
+      "--leading-tight",
+      "--oasis-green",
+      "--oasis-palm",
+      "--oasis-teal",
+      "--oasis-water",
+      "--press-scale",
+      "--radius-2xl",
+      "--radius-3xl",
+      "--radius-lg",
+      "--radius-md",
+      "--radius-pill",
+      "--radius-sm",
+      "--radius-xl",
+      "--role-eyebrow-size",
+      "--role-eyebrow-tracking",
+      "--role-eyebrow-weight",
+      "--sand-100",
+      "--sand-200",
+      "--sand-300",
+      "--sand-400",
+      "--sand-50",
+      "--sand-500",
+      "--sand-600",
+      "--sand-700",
+      "--sand-800",
+      "--sand-900",
+      "--sand-950",
+      "--shadow-card",
+      "--shadow-glow",
+      "--shadow-gold",
+      "--shadow-inset",
+      "--space-0",
+      "--space-1",
+      "--space-10",
+      "--space-12",
+      "--space-2",
+      "--space-3",
+      "--space-4",
+      "--space-5",
+      "--space-6",
+      "--space-8",
+      "--status-danger",
+      "--status-info",
+      "--status-success",
+      "--status-warning",
+      "--surface-canvas",
+      "--surface-card",
+      "--surface-card-soft",
+      "--surface-raised",
+      "--surface-sunken",
+      "--text-2xs",
+      "--text-base",
+      "--text-body",
+      "--text-display",
+      "--text-faint",
+      "--text-gold",
+      "--text-h1",
+      "--text-h2",
+      "--text-h3",
+      "--text-lg",
+      "--text-muted",
+      "--text-on-gold",
+      "--text-primary",
+      "--text-secondary",
+      "--text-sm",
+      "--text-xs",
+      "--tracking-display",
+      "--tracking-eyebrow",
+      "--tracking-normal",
+      "--tracking-tight",
+      "--tracking-wide",
+      "--weight-bold",
+      "--weight-medium",
+      "--weight-regular",
+      "--weight-semibold"
+    ],
+    "tokenKinds": {
+      "--sand-50": "color",
+      "--sand-100": "color",
+      "--sand-200": "color",
+      "--sand-300": "color",
+      "--sand-400": "color",
+      "--sand-500": "color",
+      "--sand-600": "color",
+      "--sand-700": "color",
+      "--sand-800": "color",
+      "--sand-900": "color",
+      "--sand-950": "color",
+      "--gold": "color",
+      "--gold-light": "color",
+      "--gold-deep": "color",
+      "--gold-pale": "color",
+      "--oasis-green": "color",
+      "--oasis-teal": "color",
+      "--oasis-water": "color",
+      "--oasis-palm": "color",
+      "--cavern-moss": "color",
+      "--cavern-fern": "color",
+      "--cavern-glow": "color",
+      "--cavern-pool": "color",
+      "--cavern-deep": "color",
+      "--cavern-stone": "color",
+      "--dusk-rose": "color",
+      "--dusk-violet": "color",
+      "--bg-base": "color",
+      "--surface-canvas": "color",
+      "--surface-card": "color",
+      "--surface-card-soft": "color",
+      "--surface-sunken": "color",
+      "--surface-raised": "color",
+      "--border-hairline": "color",
+      "--border-soft": "color",
+      "--border-strong": "color",
+      "--border-gold": "color",
+      "--text-primary": "font",
+      "--text-body": "font",
+      "--text-secondary": "font",
+      "--text-muted": "font",
+      "--text-faint": "font",
+      "--text-on-gold": "font",
+      "--text-gold": "font",
+      "--status-success": "color",
+      "--status-warning": "color",
+      "--status-danger": "color",
+      "--status-info": "color",
+      "--grad-gold": "color",
+      "--grad-gold-text": "color",
+      "--grad-gold-foil": "color",
+      "--grad-ring": "color",
+      "--grad-atmosphere": "color",
+      "--font-display": "font",
+      "--font-sans": "font",
+      "--font-mono": "font",
+      "--weight-regular": "font",
+      "--weight-medium": "font",
+      "--weight-semibold": "font",
+      "--weight-bold": "font",
+      "--text-display": "font",
+      "--text-h1": "font",
+      "--text-h2": "font",
+      "--text-h3": "font",
+      "--text-lg": "font",
+      "--text-base": "font",
+      "--text-sm": "font",
+      "--text-xs": "font",
+      "--text-2xs": "font",
+      "--leading-none": "font",
+      "--leading-tight": "font",
+      "--leading-snug": "font",
+      "--leading-body": "font",
+      "--tracking-display": "font",
+      "--tracking-tight": "font",
+      "--tracking-normal": "font",
+      "--tracking-wide": "font",
+      "--tracking-eyebrow": "font",
+      "--role-eyebrow-size": "spacing",
+      "--role-eyebrow-tracking": "font",
+      "--role-eyebrow-weight": "font",
+      "--space-0": "spacing",
+      "--space-1": "spacing",
+      "--space-2": "spacing",
+      "--space-3": "spacing",
+      "--space-4": "spacing",
+      "--space-5": "spacing",
+      "--space-6": "spacing",
+      "--space-8": "spacing",
+      "--space-10": "spacing",
+      "--space-12": "spacing",
+      "--radius-sm": "radius",
+      "--radius-md": "radius",
+      "--radius-lg": "radius",
+      "--radius-xl": "radius",
+      "--radius-2xl": "radius",
+      "--radius-3xl": "radius",
+      "--radius-pill": "radius",
+      "--app-max-width": "spacing",
+      "--shadow-card": "shadow",
+      "--shadow-glow": "shadow",
+      "--shadow-gold": "shadow",
+      "--shadow-inset": "shadow",
+      "--blur-card": "spacing",
+      "--blur-soft": "spacing",
+      "--ease-out": "other",
+      "--ease-spring": "other",
+      "--dur-fast": "other",
+      "--dur-base": "other",
+      "--dur-slow": "other",
+      "--press-scale": "other"
+    },
+    "fontFamilies": [
+      "Fraunces",
+      "Inter"
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+<!-- @dsCard group="Colors" viewport="700x170" name="Gold — the signature accent" subtitle="Foil gradient + its three stops. Spent carefully; the one bright thing." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: #100a06; font-family: var(--font-sans); color: var(--text-body); }
+  .wrap { padding: 20px; display: flex; gap: 16px; align-items: stretch; }
+  .foil { flex: 1.4; border-radius: 14px; background: var(--grad-gold); display: flex; align-items: flex-end; padding: 12px; box-shadow: var(--shadow-gold); }
+  .foil span { font-family: var(--font-display); color: var(--text-on-gold); font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+  .stops { flex: 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .sw { display: flex; flex-direction: column; }
+  .chip { height: 70px; border-radius: 12px; border: 1px solid rgba(247,239,223,0.06); }
+  .name { font-size: 11px; margin-top: 7px; color: var(--text-secondary); }
+  .h { font-size: 9px; color: var(--text-faint); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="foil"><span>--grad-gold</span></div>
+    <div class="stops">
+      <div class="sw"><div class="chip" style="background:var(--gold-pale)"></div><span class="name">pale</span><span class="h">#fff0c4</span></div>
+      <div class="sw"><div class="chip" style="background:var(--gold-light)"></div><span class="name">light</span><span class="h">#f6d488</span></div>
+      <div class="sw"><div class="chip" style="background:var(--gold)"></div><span class="name">gold</span><span class="h">#e7b24c</span></div>
+      <div class="sw"><div class="chip" style="background:var(--gold-deep)"></div><span class="name">deep</span><span class="h">#c8902f</span></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+/* ============================================================
+   OASIS — COLOR TOKENS
+   "A golden oasis rising from the barrens."
+   Dark, earthy, premium. Warm sand & gold on lush emerald.
+   ============================================================ */
+
+:root {
+  /* --- Sand: barren → warm. The neutral spine of the system. --- */
+  --sand-50:  #f7efdf;
+  --sand-100: #ecdcc0;
+  --sand-200: #dcc299;
+  --sand-300: #c9a36e;
+  --sand-400: #b3854b;
+  --sand-500: #946838;
+  --sand-600: #74502b;
+  --sand-700: #553a20;
+  --sand-800: #392716;
+  --sand-900: #1f150c;
+  --sand-950: #130d07;
+
+  /* --- Gold: the signature accent. Foil, sun, achievement. --- */
+  --gold:       #e7b24c;
+  --gold-light: #f6d488;
+  --gold-deep:  #c8902f;
+  --gold-pale:  #fff0c4; /* highlight tip of foil gradients */
+
+  /* --- Oasis: living water & growth greens. --- */
+  --oasis-green: #3f8a5b;
+  --oasis-teal:  #2f7d72;
+  --oasis-water: #4cc4d4;
+  --oasis-palm:  #5aa469; /* "done / success" green */
+
+  /* --- Cavern: overgrown, bioluminescent depths (Wailing Caverns). --- */
+  --cavern-moss:  #6f8f3f;
+  --cavern-fern:  #3f7a4a;
+  --cavern-glow:  #7ff0c0; /* bioluminescent spore light */
+  --cavern-pool:  #1c6f68;
+  --cavern-deep:  #0c3b3a;
+  --cavern-stone: #2a2118;
+
+  /* --- Dusk: warm terracotta & muted violet for alerts/secondary. --- */
+  --dusk-rose:   #d98a6a; /* warnings, destructive, flame */
+  --dusk-violet: #6b4a6e;
+
+  /* === SEMANTIC ALIASES ====================================== */
+
+  /* Backgrounds / surfaces */
+  --bg-base:        #0b1310; /* app canvas behind the atmosphere */
+  --surface-canvas: #0a130f;
+  --surface-card:   rgba(31, 21, 12, 0.40);  /* .glass fill */
+  --surface-card-soft: rgba(31, 21, 12, 0.30);
+  --surface-sunken: rgba(57, 39, 22, 0.40);  /* inputs, steppers */
+  --surface-raised: rgba(57, 39, 22, 0.50);  /* chips, icon tiles */
+
+  /* Borders / hairlines */
+  --border-hairline: rgba(116, 80, 43, 0.40); /* sand-600 @ 40% */
+  --border-soft:     rgba(116, 80, 43, 0.25);
+  --border-strong:   rgba(116, 80, 43, 0.55);
+  --border-gold:     rgba(231, 178, 76, 0.50);
+
+  /* Text */
+  --text-primary:   #f7efdf; /* sand-50, headings */
+  --text-body:      #f3e6cf; /* default body */
+  --text-secondary: rgba(220, 194, 153, 0.70); /* sand-200 @ 70 */
+  --text-muted:     rgba(220, 194, 153, 0.50);
+  --text-faint:     rgba(220, 194, 153, 0.35);
+  --text-on-gold:   #130d07; /* sand-950 — text atop gold buttons */
+  --text-gold:      #e7b24c;
+
+  /* Status */
+  --status-success: #5aa469;
+  --status-warning: #e7b24c;
+  --status-danger:  #d98a6a;
+  --status-info:    #4cc4d4;
+
+  /* === GRADIENTS ============================================= */
+
+  /* Gold foil — buttons, headlines, the trajectory line. */
+  --grad-gold:       linear-gradient(135deg, #f6d488, #e7b24c 55%, #c8902f); /* @kind color */
+  --grad-gold-text:  linear-gradient(120deg, #f6d488, #e7b24c 45%, #c8902f); /* @kind color */
+  --grad-gold-foil:  linear-gradient(90deg, #c8902f, #f6d488 50%, #fff0c4); /* @kind color */
+  /* Ring / progress — gold blooming into living green. */
+  --grad-ring:       linear-gradient(135deg, #f6d488, #e7b24c 60%, #5aa469); /* @kind color */
+
+  /* Atmosphere — golden sun above, emerald jungle at the sides,
+     turquoise coast pooling below, dark vignette for depth. */
+  --grad-atmosphere:
+    radial-gradient(135% 80% at 50% -10%, rgba(246, 196, 90, 0.22) 0%, rgba(246, 196, 90, 0) 46%),
+    radial-gradient(86% 60% at 8% 30%, rgba(120, 142, 72, 0.16) 0%, rgba(120, 142, 72, 0) 55%),
+    radial-gradient(82% 58% at 92% 22%, rgba(63, 122, 74, 0.14) 0%, rgba(63, 122, 74, 0) 55%),
+    radial-gradient(120% 70% at 50% 92%, rgba(148, 104, 56, 0.20) 0%, rgba(148, 104, 56, 0) 55%),
+    radial-gradient(135% 85% at 50% 118%, rgba(26, 166, 189, 0.16) 0%, rgba(26, 166, 189, 0) 58%),
+    radial-gradient(120% 120% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.6) 100%),
+    linear-gradient(180deg, #161509 0%, #11140d 46%, #0c120e 100%); /* @kind color */
+}
