@@ -29,12 +29,13 @@ export default function Home() {
   const todayBlock = level.blocks[0]
   const exCount = todayBlock.exercises.length
   const mins = Math.round(exCount * 4.5)
+  const today = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
 
   return (
     <div className="space-y-3 pt-1">
       <PageHeader
-        eyebrow={`${greeting()}${profile.name ? `, ${profile.name}` : ''}`}
-        title="Your oasis"
+        eyebrow={today}
+        title={`${greeting()}${profile.name ? `, ${profile.name}` : ''}`}
         right={<Avatar size={40} />}
       />
 

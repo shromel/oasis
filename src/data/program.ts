@@ -95,7 +95,6 @@ export const LEVELS: Level[] = [
           ex('Negatives', '2x1', { sets: 2, repsLow: 1, repsHigh: 1, notes: 'After pullups — jump to top, 5 sec down' }),
           ex('Inverted rows', '3x8', { sets: 3, repsLow: 8, repsHigh: 8, notes: 'Body 45°, squeeze shoulder blades at top' }),
           ex('Dips', '3x3', { sets: 3, repsLow: 3, repsHigh: 3, notes: 'Elbows BACK, slight forward lean' }),
-          ex('Pike pushups', '3x8', { sets: 3, repsLow: 8, repsHigh: 8, notes: 'Hips high, lower head toward floor' }),
           ex('Twisting knee raises', '3x8 per side', { sets: 3, repsLow: 8, repsHigh: 8, perSide: true, notes: 'Hang, knees up, rotate to each side controlled' }),
           ex('Leg raises', 'max after each set', { sets: 3, repsLow: null, repsHigh: null, notes: 'Straight legs, whatever you can manage' }),
         ],
@@ -107,6 +106,7 @@ export const LEVELS: Level[] = [
         subtitle: 'Floor work',
         exercises: [
           ex('Pushups', '4x15', { sets: 4, repsLow: 15, repsHigh: 15, notes: 'Chest to floor, elbows 45°, squeeze chest at top' }),
+          ex('Pike pushups', '3x8', { sets: 3, repsLow: 8, repsHigh: 8, notes: 'Hips high, lower head toward floor' }),
           ex('Squats deep', '3x20', { sets: 3, repsLow: 20, repsHigh: 20, notes: 'Slow and intentional' }),
           ex('Side plank', '3x30 sec per side', { sets: 3, repsLow: 30, repsHigh: 30, unit: 'sec', perSide: true, notes: 'Obliques' }),
           ex('Plank elbows', '3x45 sec', { sets: 3, repsLow: 45, repsHigh: 45, unit: 'sec' }),
