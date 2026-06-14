@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getLevel, LEVELS } from '../data/program'
+import { sumNutrients, type Food, type FoodLog, type Meal, type SavedMeal, type Nutrients, type ActivityLevel } from '../lib/nutrition'
 
 export type Goal = 'cut' | 'maintain' | 'bulk'
 export type Sex = 'male' | 'female'
@@ -13,6 +14,12 @@ export interface Profile {
   sex: Sex
   goal: Goal
   startedAt: string // ISO date the journey began
+  // Nutrition / goal questionnaire (added v0.2; optional for back-compat)
+  activity?: ActivityLevel
+  rateKgPerWeek?: number // + gain, - lose, 0 maintain
+  targetWeightKg?: number | null
+  proteinPerKg?: number
+  onboarded?: boolean
 }
 
 export interface LoggedEntry {
@@ -59,6 +66,10 @@ export interface OasisState {
   sessions: Session[]
   retests: Retest[]
   bodyweight: BodyweightEntry[]
+  // Nutrition (v0.2)
+  foodLog: FoodLog[]
+  savedFoods: Food[]
+  savedMeals: SavedMeal[]
 
   setProfile: (p: Partial<Profile>) => void
   setLevel: (level: number) => void
@@ -68,6 +79,14 @@ export interface OasisState {
   deleteSession: (id: string) => void
   addRetest: (values: Record<string, number>, date?: string) => void
   logBodyweight: (kg: number, date?: string) => void
+  // Nutrition actions
+  addFoodLog: (meal: Meal, food: Food, grams: number, date?: string) => void
+  removeFoodLog: (id: string) => void
+  setFoodGrams: (id: string, grams: number) => void
+  toggleSavedFood: (food: Food) => void
+  saveMeal: (name: string, items: { food: Food; grams: number }[]) => void
+  deleteMeal: (id: string) => void
+  logSavedMeal: (mealId: string, slot: Meal, date?: string) => void
   exportData: () => string
   importData: (json: string) => boolean
   resetAll: () => void
@@ -84,6 +103,11 @@ const DEFAULT_PROFILE: Profile = {
   sex: 'male',
   goal: 'maintain',
   startedAt: todayISO(),
+  activity: 'moderate',
+  rateKgPerWeek: 0,
+  targetWeightKg: null,
+  proteinPerKg: 2.0,
+  onboarded: false,
 }
 
 export const useStore = create<OasisState>()(
@@ -95,6 +119,9 @@ export const useStore = create<OasisState>()(
       sessions: [],
       retests: [],
       bodyweight: [],
+      foodLog: [],
+      savedFoods: [],
+      savedMeals: [],
 
       setProfile: (p) => set((s) => ({ profile: { ...s.profile, ...p } })),
 
@@ -153,10 +180,42 @@ export const useStore = create<OasisState>()(
           bodyweight: [{ date: date ?? todayISO(), kg }, ...s.bodyweight],
         })),
 
+      // ----- Nutrition -----
+      addFoodLog: (meal, food, grams, date) =>
+        set((s) => ({
+          foodLog: [{ id: uid(), date: date ?? todayISO(), meal, food, grams }, ...s.foodLog],
+        })),
+
+      removeFoodLog: (id) => set((s) => ({ foodLog: s.foodLog.filter((x) => x.id !== id) })),
+
+      setFoodGrams: (id, grams) =>
+        set((s) => ({ foodLog: s.foodLog.map((x) => (x.id === id ? { ...x, grams } : x)) })),
+
+      toggleSavedFood: (food) =>
+        set((s) => {
+          const key = food.barcode ?? food.id
+          const exists = s.savedFoods.some((f) => (f.barcode ?? f.id) === key)
+          return { savedFoods: exists ? s.savedFoods.filter((f) => (f.barcode ?? f.id) !== key) : [food, ...s.savedFoods] }
+        }),
+
+      saveMeal: (name, items) =>
+        set((s) => ({ savedMeals: [{ id: uid(), name, items }, ...s.savedMeals] })),
+
+      deleteMeal: (id) => set((s) => ({ savedMeals: s.savedMeals.filter((m) => m.id !== id) })),
+
+      logSavedMeal: (mealId, slot, date) =>
+        set((s) => {
+          const m = s.savedMeals.find((x) => x.id === mealId)
+          if (!m) return {}
+          const d = date ?? todayISO()
+          const entries: FoodLog[] = m.items.map((it) => ({ id: uid(), date: d, meal: slot, food: it.food, grams: it.grams }))
+          return { foodLog: [...entries, ...s.foodLog] }
+        }),
+
       exportData: () => {
-        const { profile, currentLevel, targets, sessions, retests, bodyweight } = get()
+        const { profile, currentLevel, targets, sessions, retests, bodyweight, foodLog, savedFoods, savedMeals } = get()
         return JSON.stringify(
-          { version: 1, exportedAt: todayISO(), profile, currentLevel, targets, sessions, retests, bodyweight },
+          { version: 2, exportedAt: todayISO(), profile, currentLevel, targets, sessions, retests, bodyweight, foodLog, savedFoods, savedMeals },
           null,
           2,
         )
@@ -173,6 +232,9 @@ export const useStore = create<OasisState>()(
             sessions: data.sessions ?? [],
             retests: data.retests ?? [],
             bodyweight: data.bodyweight ?? [],
+            foodLog: data.foodLog ?? [],
+            savedFoods: data.savedFoods ?? [],
+            savedMeals: data.savedMeals ?? [],
           }))
           return true
         } catch {
@@ -188,6 +250,9 @@ export const useStore = create<OasisState>()(
           sessions: [],
           retests: [],
           bodyweight: [],
+          foodLog: [],
+          savedFoods: [],
+          savedMeals: [],
         })),
     }),
     { name: 'oasis-store-v1' },
@@ -275,6 +340,25 @@ export const dayKey = (iso: string | Date = new Date()): string => {
 export function todaySessionForBlock(sessions: Session[], blockId: string): Session | undefined {
   const key = dayKey()
   return sessions.find((s) => s.blockId === blockId && dayKey(s.date) === key)
+}
+
+// ---------- Nutrition selectors ----------
+
+/** All food logged on a given local day. */
+export function foodLogForDay(log: FoodLog[], date: Date | string = new Date()): FoodLog[] {
+  const key = dayKey(date)
+  return log.filter((l) => dayKey(l.date) === key)
+}
+
+/** Summed macros for a given day's food log. */
+export function dailyTotals(log: FoodLog[], date: Date | string = new Date()): Nutrients {
+  return sumNutrients(foodLogForDay(log, date))
+}
+
+/** Is this food already in saved favourites? */
+export function isSavedFood(savedFoods: Food[], food: Food): boolean {
+  const key = food.barcode ?? food.id
+  return savedFoods.some((f) => (f.barcode ?? f.id) === key)
 }
 
 const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0)

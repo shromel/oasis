@@ -55,6 +55,27 @@ const OFF_MAP: { off: string; key: NutrientKey; mult: number }[] = [
   { off: 'zinc_100g', key: 'zinc', mult: 1000 },
 ]
 
+/** Map a raw Open Food Facts product object → our Food. */
+export function mapOffProduct(p: any): Food | null {
+  if (!p) return null
+  const n = p.nutriments ?? {}
+  const per100g: Nutrients = {}
+  for (const { off, key, mult } of OFF_MAP) {
+    const v = n[off]
+    if (typeof v === 'number' && !Number.isNaN(v)) per100g[key] = v * mult
+  }
+  if (per100g.kcal == null) return null // unusable without energy
+  const sq = Number(p.serving_quantity)
+  return {
+    id: String(p.code ?? p._id ?? p.product_name ?? Math.random()),
+    name: p.product_name || p.generic_name || 'Unknown food',
+    brand: p.brands || undefined,
+    barcode: p.code ? String(p.code) : undefined,
+    servingG: Number.isFinite(sq) && sq > 0 ? sq : null,
+    per100g,
+  }
+}
+
 /** Look up a product by barcode on Open Food Facts. Returns null if not found. */
 export async function fetchOpenFoodFacts(barcode: string): Promise<Food | null> {
   const url = `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`
@@ -62,21 +83,29 @@ export async function fetchOpenFoodFacts(barcode: string): Promise<Food | null> 
   if (!res.ok) return null
   const data = await res.json()
   if (!data || data.status !== 1 || !data.product) return null
-  const p = data.product
-  const n = p.nutriments ?? {}
-  const per100g: Nutrients = {}
-  for (const { off, key, mult } of OFF_MAP) {
-    const v = n[off]
-    if (typeof v === 'number' && !Number.isNaN(v)) per100g[key] = v * mult
+  return mapOffProduct({ ...data.product, code: barcode })
+}
+
+/** Search Open Food Facts by name. Returns the best mappable matches. */
+export async function searchOpenFoodFacts(query: string, signal?: AbortSignal): Promise<Food[]> {
+  const q = query.trim()
+  if (q.length < 2) return []
+  // api/v2/search is the CORS-enabled endpoint (the legacy cgi/search.pl is not).
+  const url = `https://world.openfoodfacts.org/api/v2/search?search_terms=${encodeURIComponent(q)}&fields=code,product_name,generic_name,brands,serving_quantity,nutriments&page_size=24`
+  const res = await fetch(url, { signal })
+  if (!res.ok) throw new Error(`Open Food Facts search ${res.status}`) // surfaced as a retryable error
+  const data = await res.json()
+  const products: any[] = data?.products ?? []
+  const out: Food[] = []
+  const seen = new Set<string>()
+  for (const p of products) {
+    const f = mapOffProduct(p)
+    if (f && f.name !== 'Unknown food' && !seen.has(f.id)) {
+      seen.add(f.id)
+      out.push(f)
+    }
   }
-  return {
-    id: barcode,
-    name: p.product_name || p.generic_name || 'Unknown food',
-    brand: p.brands || undefined,
-    barcode,
-    servingG: typeof p.serving_quantity === 'number' ? p.serving_quantity : null,
-    per100g,
-  }
+  return out
 }
 
 /** Scale a food's per-100g nutrients to an actual gram amount. */
@@ -124,6 +153,85 @@ export function mifflinStTdee(profile: Profile, activity: Activity = 'moderate')
   const bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + s
   const maintenance = bmr * ACTIVITY[activity]
   return { bmr: Math.round(bmr), maintenance: Math.round(maintenance), target: Math.round(maintenance + GOAL_DELTA[goal]) }
+}
+
+// ---------- Goal-driven daily targets ----------
+
+export const ACTIVITY_FACTORS = { sedentary: 1.2, light: 1.375, moderate: 1.55, very: 1.725 } as const
+export type ActivityLevel = keyof typeof ACTIVITY_FACTORS
+
+export interface MacroTargets {
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  bmr: number
+  maintenance: number // TDEE before the goal delta
+  deltaKcal: number // surplus (+) or deficit (-)
+}
+
+export interface TargetInput {
+  weightKg: number | null
+  heightCm: number | null
+  age: number | null
+  sex: Sex
+  activity?: ActivityLevel | null
+  rateKgPerWeek?: number | null // + gain, - lose, 0 maintain
+  proteinPerKg?: number | null
+}
+
+const KCAL_PER_KG = 7700 // ~energy in 1 kg of body mass
+
+/** Full daily targets from profile + goal: Mifflin-St Jeor → TDEE → rate delta,
+ *  protein by bodyweight, fat at 0.8 g/kg, carbs as the remainder. */
+export function computeTargets(p: TargetInput): MacroTargets | null {
+  if (!p.weightKg || !p.heightCm || !p.age) return null
+  const s = p.sex === 'female' ? -161 : 5
+  const bmr = 10 * p.weightKg + 6.25 * p.heightCm - 5 * p.age + s
+  const maintenance = bmr * ACTIVITY_FACTORS[p.activity ?? 'moderate']
+  const deltaKcal = ((p.rateKgPerWeek ?? 0) * KCAL_PER_KG) / 7
+  const calories = Math.round(maintenance + deltaKcal)
+  const protein = Math.round(p.weightKg * (p.proteinPerKg ?? 2.0))
+  const fat = Math.round(p.weightKg * 0.8)
+  const carbs = Math.max(0, Math.round((calories - protein * 4 - fat * 9) / 4))
+  return {
+    calories,
+    protein,
+    carbs,
+    fat,
+    bmr: Math.round(bmr),
+    maintenance: Math.round(maintenance),
+    deltaKcal: Math.round(deltaKcal),
+  }
+}
+
+export interface SavedMeal {
+  id: string
+  name: string
+  items: { food: Food; grams: number }[]
+}
+
+/** Build a Food from a single serving's macros (manual entry / OFF serving). */
+export function foodFromServing(
+  name: string,
+  grams: number,
+  macros: { kcal: number; protein: number; carbs: number; fat: number },
+  opts: { brand?: string; barcode?: string } = {},
+): Food {
+  const f = grams > 0 ? 100 / grams : 1
+  return {
+    id: opts.barcode ?? `m_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+    name,
+    brand: opts.brand,
+    barcode: opts.barcode,
+    servingG: grams || null,
+    per100g: {
+      kcal: macros.kcal * f,
+      protein: macros.protein * f,
+      carbs: macros.carbs * f,
+      fat: macros.fat * f,
+    },
+  }
 }
 
 // ---------- RDA targets + nutrition score ----------

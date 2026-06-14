@@ -1,13 +1,14 @@
 import { useRef, useState, type ReactNode } from 'react'
-import { Download, Upload, RotateCcw, Check, ChevronRight, User, Ruler, Target, Layers } from 'lucide-react'
+import { Download, Upload, RotateCcw, Check, ChevronRight, User, Ruler, Target, Layers, SlidersHorizontal } from 'lucide-react'
 import { useStore, type Goal, type Sex } from '../store/useStore'
 import { LEVELS, getLevel } from '../data/program'
+import { computeTargets } from '../lib/nutrition'
 import { PageHeader, Avatar } from '../components/ui'
 
-const goals: { id: Goal; label: string; hint: string }[] = [
-  { id: 'cut', label: 'Cut', hint: 'lose fat' },
-  { id: 'maintain', label: 'Maintain', hint: 'hold steady' },
-  { id: 'bulk', label: 'Bulk', hint: 'build mass' },
+const goals: { id: Goal; label: string; hint: string; rate: number }[] = [
+  { id: 'cut', label: 'Cut', hint: 'lose fat', rate: -0.5 },
+  { id: 'maintain', label: 'Maintain', hint: 'hold steady', rate: 0 },
+  { id: 'bulk', label: 'Bulk', hint: 'build mass', rate: 0.25 },
 ]
 
 export default function You() {
@@ -39,6 +40,7 @@ export default function You() {
   }
 
   const level = getLevel(currentLevel)
+  const targets = computeTargets(profile)
   const since = new Date(profile.startedAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
   const sexSym = profile.sex === 'female' ? '♀' : '♂'
   const toggle = (id: string) => setOpen((o) => (o === id ? null : id))
@@ -87,15 +89,21 @@ export default function You() {
           </div>
         </Row>
 
-        <Row icon={<Target size={16} />} label="Goal" value={profile.goal[0].toUpperCase() + profile.goal.slice(1)} open={open === 'goal'} onClick={() => toggle('goal')}>
+        <Row icon={<Target size={16} />} label="Goal" value={goalValue(profile.goal, profile.rateKgPerWeek ?? 0)} open={open === 'goal'} onClick={() => toggle('goal')}>
           <div className="flex gap-2">
             {goals.map((g) => (
-              <button key={g.id} onClick={() => setProfile({ goal: g.id })} className={`flex-1 py-2.5 rounded-xl border text-sm transition ${profile.goal === g.id ? 'bg-gold/15 border-gold/50 text-gold' : 'border-sand-600/40 text-sand-200/70'}`}>
+              <button key={g.id} onClick={() => setProfile({ goal: g.id, rateKgPerWeek: g.rate })} className={`flex-1 py-2.5 rounded-xl border text-sm transition ${profile.goal === g.id ? 'bg-gold/15 border-gold/50 text-gold' : 'border-sand-600/40 text-sand-200/70'}`}>
                 <span className="block font-medium">{g.label}</span>
                 <span className="block text-[10px] opacity-70">{g.hint}</span>
               </button>
             ))}
           </div>
+          {targets && (
+            <p className="text-sand-200/55 text-xs mt-3">
+              Targets: <span className="text-gold">{targets.calories.toLocaleString()} kcal</span> · {targets.protein}g P · {targets.carbs}g C · {targets.fat}g F.{' '}
+              <button onClick={() => setProfile({ onboarded: false })} className="text-gold underline">Fine-tune in setup</button>
+            </p>
+          )}
         </Row>
 
         <Row icon={<Layers size={16} />} label="Level" value={`${level.name} (L${level.id})`} open={open === 'level'} onClick={() => toggle('level')} last>
@@ -110,6 +118,7 @@ export default function You() {
 
       {/* Actions */}
       <div className="space-y-2">
+        <ActionRow icon={<SlidersHorizontal size={17} />} label="Edit goals & targets" onClick={() => setProfile({ onboarded: false })} />
         <ActionRow icon={<Download size={17} />} label="Export data" onClick={doExport} />
         <ActionRow icon={<Upload size={17} />} label="Import backup" onClick={() => fileRef.current?.click()} />
         <ActionRow icon={<RotateCcw size={17} />} label="Reset progress" danger onClick={() => { if (confirm('Reset all data? This cannot be undone.')) { resetAll(); flash('Everything reset') } }} />
@@ -150,6 +159,11 @@ function ActionRow({ icon, label, danger, onClick }: { icon: ReactNode; label: s
       <span className={`text-sm ${danger ? 'text-dusk-rose' : 'text-sand-100'}`}>{label}</span>
     </button>
   )
+}
+
+function goalValue(goal: Goal, rate: number): string {
+  const label = goal[0].toUpperCase() + goal.slice(1)
+  return rate ? `${label} · ${rate > 0 ? '+' : ''}${rate}kg/wk` : label
 }
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
