@@ -39,6 +39,16 @@ A crossover of **Hevy (training)** × **Cronometer (nutrition)** with a "golden 
 - **Renamed "Oasis" tab → "Home"** (house icon) and de-cringed microcopy ("Session saved" / "Logged to your progress"; cleaner level taglines).
 - Hero still shows **momentum %** (`bloomScore.trendPct`) as a stat; "bloom" wording dropped from the UI.
 
+## ✅ Done (v1.3 — screens rebuilt to the design-system mockups, 2026-06-14)
+- Installed the exported design system as the **`oasis-design` skill** (`.claude/skills/oasis-design/`); brand illustrated app icon now drives the PWA icons.
+- **Rebuilt every screen to the `ui_kits/oasis-app` mockups.** Shared primitives in `src/components/ui.tsx` (`PageHeader` eyebrow+title, `Avatar`, `StatTile`, `CriterionBar`, `InfoChip`).
+  - Home: eyebrow greeting + "Your oasis" + avatar; trajectory header (% / "toward Ln" / trend chip) over the chart; stats = streak / this week / **sessions**; Path ring + bars; "Today · <block>" CTA.
+  - Nourish: designed "soon" state (score ring + macro bars + real Mifflin-St Jeor calorie target + "Scan a food").
+  - Progress: eyebrow "Level N · <name>"; current bests as criterion bars vs next level; retest-due chip; history.
+  - You: "Your account" + avatar profile card; tappable rows expand to edit; export/import/reset rows.
+  - Train: "Your program" eyebrow header.
+- **Naming note:** the system's exported files use numeric **L1–L4 + Foundation/Strength Base/…** subtitles (per README + kit). The user's later screenshots showed botanical names (Roots/Canopy) from a newer claude.ai iteration that wasn't exported — NOT adopted (would clash with the real program). Revisit only if the user explicitly wants botanical level names.
+
 ## 👉 START HERE NEXT — Nourish (nutrition) kickoff
 The next session builds the **Nourish** half. A typed foundation already exists in **`src/lib/nutrition.ts`** (pure functions, no UI yet): `Food`/`FoodLog` types, `fetchOpenFoodFacts(barcode)`, `mifflinStTdee(profile)`, `rdaTargets(profile)`, `nutritionScore(totals, targets)`. First steps:
 1. Add nutrition state to the store: `foodLog: FoodLog[]`, `addFood`, `updateFoodEntry`, `removeFood`; selector `dailyTotals(date)`. Keep in localStorage for now; move to Dexie/IndexedDB only when entries get large.
