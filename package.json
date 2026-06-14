@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.69.0",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
     "date-fns": "^3.6.0",

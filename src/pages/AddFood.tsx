@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, Search, Star, Bookmark, Pencil, ScanBarcode, Plus, Loader2 } from 'lucide-react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { ArrowLeft, Search, Star, Bookmark, Pencil, ScanBarcode, Plus, Loader2, Camera, Sparkles, X, ChevronRight, Trash2 } from 'lucide-react'
 import BarcodeScanner from '../components/BarcodeScanner'
-import { useStore, isSavedFood } from '../store/useStore'
+import ServingSheet from '../components/ServingSheet'
+import { useStore, isSavedFood, aiScansToday, AI_DAILY_CAP } from '../store/useStore'
+import { downscaleImage, analyzeFoodPhoto, hasApiKey, AI_MODEL_LABELS, type DetectedItem } from '../lib/ai'
 import {
   searchOpenFoodFacts,
   fetchOpenFoodFacts,
@@ -55,15 +57,23 @@ export default function AddFood() {
         />
       )}
       {tab === 'manual' && <ManualTab onCreate={setSelected} />}
-      {tab === 'scan' && <ScanTab onFound={setSelected} onManual={() => setTab('manual')} />}
+      {tab === 'scan' && (
+        <ScanTab
+          meal={meal}
+          onPick={setSelected}
+          onManual={() => setTab('manual')}
+          onLogAll={(items) => { items.forEach((it) => addFoodLog(meal, it.food, it.grams)); done() }}
+        />
+      )}
 
       {selected && (
         <ServingSheet
           food={selected}
+          mealLabel={meal}
           saved={isSavedFood(savedFoods, selected)}
-          onSave={() => toggleSavedFood(selected)}
+          onToggleSave={() => toggleSavedFood(selected)}
           onCancel={() => setSelected(null)}
-          onAdd={(grams) => { addFoodLog(meal, selected, grams); done() }}
+          onConfirm={(grams) => { addFoodLog(meal, selected, grams); done() }}
         />
       )}
     </div>
@@ -220,16 +230,44 @@ function Num({ label, v, set }: { label: string; v: string; set: (s: string) => 
   )
 }
 
-function ScanTab({ onFound, onManual }: { onFound: (f: Food) => void; onManual: () => void }) {
-  const [status, setStatus] = useState<'scan' | 'looking' | 'notfound'>('scan')
+function ScanTab({ meal, onPick, onManual, onLogAll }: { meal: Meal; onPick: (f: Food) => void; onManual: () => void; onLogAll: (items: DetectedItem[]) => void }) {
+  const [mode, setMode] = useState<'choose' | 'barcode' | 'photo'>('choose')
 
+  if (mode === 'barcode') return <BarcodeFlow onFound={onPick} onManual={onManual} onBack={() => setMode('choose')} />
+  if (mode === 'photo') return <PhotoFlow meal={meal} onLogAll={onLogAll} onBack={() => setMode('choose')} />
+
+  return (
+    <div className="space-y-3">
+      <BigChoice icon={<ScanBarcode size={22} className="text-gold" />} title="Scan barcode" desc="Packaged foods via Open Food Facts" onClick={() => setMode('barcode')} />
+      <BigChoice icon={<Camera size={22} className="text-oasis-water" />} title="Snap a meal" desc="Estimate macros from a photo with AI" badge="AI" onClick={() => setMode('photo')} />
+    </div>
+  )
+}
+
+function BigChoice({ icon, title, desc, badge, onClick }: { icon: React.ReactNode; title: string; desc: string; badge?: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="w-full glass p-4 flex items-center gap-4 text-left active:scale-[0.99] transition">
+      <div className="grid place-items-center w-12 h-12 rounded-2xl bg-sand-800/50 shrink-0">{icon}</div>
+      <div className="flex-1">
+        <p className="text-sand-50 font-medium flex items-center gap-2">
+          {title}
+          {badge && <span className="chip text-oasis-water border-oasis-water/40 bg-oasis-water/5 !py-0.5">{badge}</span>}
+        </p>
+        <p className="text-sand-200/55 text-xs mt-0.5">{desc}</p>
+      </div>
+      <ChevronRight size={18} className="text-sand-300/40" />
+    </button>
+  )
+}
+
+function BarcodeFlow({ onFound, onManual, onBack }: { onFound: (f: Food) => void; onManual: () => void; onBack: () => void }) {
+  const [status, setStatus] = useState<'scan' | 'looking' | 'notfound'>('scan')
   const handle = async (code: string) => {
     setStatus('looking')
     const food = await fetchOpenFoodFacts(code)
     if (food) onFound(food)
     else setStatus('notfound')
   }
-
   if (status === 'looking') return <p className="text-center text-sand-200/60 py-10 flex items-center justify-center gap-2"><Loader2 size={16} className="animate-spin" /> Looking up barcode…</p>
   if (status === 'notfound') {
     return (
@@ -240,50 +278,141 @@ function ScanTab({ onFound, onManual }: { onFound: (f: Food) => void; onManual: 
       </div>
     )
   }
-  return <BarcodeScanner onDetect={handle} onClose={onManual} />
-}
-
-function ServingSheet({ food, saved, onSave, onCancel, onAdd }: { food: Food; saved: boolean; onSave: () => void; onCancel: () => void; onAdd: (grams: number) => void }) {
-  const [grams, setGrams] = useState(String(food.servingG ?? 100))
-  const g = Number(grams) || 0
-  const n = scaleNutrients(food.per100g, g)
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onCancel}>
-      <div className="absolute inset-0 bg-black/50" />
-      <div className="relative w-full max-w-md glass !rounded-t-3xl !rounded-b-none p-5 pb-8 animate-floatUp" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="min-w-0">
-            <p className="text-sand-50 font-medium leading-tight">{food.name}</p>
-            {food.brand && <p className="text-sand-200/50 text-xs mt-0.5">{food.brand}</p>}
-          </div>
-          <button onClick={onSave} className={`grid place-items-center w-9 h-9 rounded-xl border shrink-0 ${saved ? 'bg-gold/15 border-gold/50 text-gold' : 'border-sand-600/40 text-sand-200/60'}`} title="Save food">
-            <Star size={16} fill={saved ? 'currentColor' : 'none'} />
-          </button>
-        </div>
-
-        <label className="block text-[10px] uppercase tracking-wider text-sand-200/50 mb-1.5">Amount (grams)</label>
-        <input autoFocus className="input mb-4" inputMode="decimal" value={grams} onChange={(e) => setGrams(e.target.value.replace(/[^0-9.]/g, ''))} />
-
-        <div className="grid grid-cols-4 gap-2 text-center mb-5">
-          <Macro v={Math.round(n.kcal ?? 0)} l="kcal" c="gold-text" />
-          <Macro v={Math.round(n.protein ?? 0)} l="protein" c="text-oasis-palm" />
-          <Macro v={Math.round(n.carbs ?? 0)} l="carbs" c="text-oasis-water" />
-          <Macro v={Math.round(n.fat ?? 0)} l="fat" c="text-gold" />
-        </div>
-
-        <button onClick={() => g > 0 && onAdd(g)} disabled={g <= 0} className="btn-gold w-full flex items-center justify-center gap-2 disabled:opacity-40">
-          <Plus size={18} /> Add to diary
-        </button>
-      </div>
+    <div>
+      <BarcodeScanner onDetect={handle} onClose={onBack} />
+      <button onClick={onBack} className="block mx-auto mt-3 text-sand-200/60 text-sm">← Back</button>
     </div>
   )
 }
 
-function Macro({ v, l, c }: { v: number; l: string; c: string }) {
+function PhotoFlow({ meal, onLogAll, onBack }: { meal: Meal; onLogAll: (items: DetectedItem[]) => void; onBack: () => void }) {
+  const aiModel = useStore((s) => s.aiModel)
+  const aiUsage = useStore((s) => s.aiUsage)
+  const recordAiScan = useStore((s) => s.recordAiScan)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const [preview, setPreview] = useState<string | null>(null)
+  const [file, setFile] = useState<File | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [items, setItems] = useState<DetectedItem[] | null>(null)
+  const [error, setError] = useState('')
+
+  const scansToday = aiScansToday(aiUsage)
+  const capReached = scansToday >= AI_DAILY_CAP
+  const keyOk = hasApiKey()
+
+  const pick = (f: File) => {
+    setFile(f)
+    setPreview(URL.createObjectURL(f))
+    setItems(null)
+    setError('')
+  }
+
+  const analyze = async () => {
+    if (!file || busy || capReached || !keyOk) return
+    setBusy(true)
+    setError('')
+    try {
+      const { base64, mediaType } = await downscaleImage(file)
+      recordAiScan() // count before the call so a failure still counts against runaway loops
+      const result = await analyzeFoodPhoto(base64, mediaType, aiModel)
+      if (result.length === 0) setError('No food detected — try a clearer photo or add manually.')
+      else setItems(result)
+    } catch (e) {
+      const msg = (e as Error)?.message || ''
+      setError(/401|authentication|invalid/i.test(msg) ? 'Invalid API key — check it in You → AI scanner.' : /credit|billing|quota/i.test(msg) ? 'Your Anthropic account needs credit.' : 'Could not analyze the photo. Try again.')
+    }
+    setBusy(false)
+  }
+
+  // ---- review state ----
+  if (items) return <PhotoReview items={items} meal={meal} onLogAll={onLogAll} onRetake={() => { setItems(null); setPreview(null); setFile(null) }} />
+
   return (
-    <div className="glass-soft py-2.5">
-      <p className={`font-display text-lg leading-none ${c}`}>{v}</p>
-      <p className="text-sand-200/45 text-[10px] mt-1">{l}</p>
+    <div className="space-y-4">
+      <button onClick={onBack} className="text-sand-200/60 text-sm">← Back</button>
+
+      {!keyOk && (
+        <div className="glass p-4 text-sm text-sand-200/75">
+          To estimate macros from a photo, add your AI key in{' '}
+          <Link to="/you" className="text-gold underline">You → AI scanner</Link>. It's stored only on this device.
+        </div>
+      )}
+
+      <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => e.target.files?.[0] && pick(e.target.files[0])} />
+
+      {preview ? (
+        <div className="glass overflow-hidden">
+          <img src={preview} alt="meal" className="w-full max-h-72 object-cover" />
+          <div className="p-3 flex items-center justify-between">
+            <button onClick={() => fileRef.current?.click()} className="text-sand-200/60 text-sm flex items-center gap-1.5"><Camera size={15} /> Retake</button>
+            <button onClick={analyze} disabled={busy || capReached || !keyOk} className="btn-gold flex items-center gap-2 text-sm disabled:opacity-40">
+              {busy ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />} {busy ? 'Analyzing…' : 'Analyze'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button onClick={() => fileRef.current?.click()} className="w-full glass p-8 flex flex-col items-center gap-3 active:scale-[0.99] transition">
+          <div className="grid place-items-center w-16 h-16 rounded-3xl bg-gold/15 shadow-glow"><Camera size={30} className="text-gold" /></div>
+          <p className="text-sand-50 font-medium">Take or choose a photo</p>
+          <p className="text-sand-200/50 text-xs text-center">Point at your meal — the AI estimates the macros, then you adjust.</p>
+        </button>
+      )}
+
+      {error && <p className="text-dusk-rose text-sm text-center">{error}</p>}
+
+      <p className="text-center text-sand-200/40 text-xs">
+        {AI_MODEL_LABELS[aiModel]} · {scansToday}/{AI_DAILY_CAP} scans today{capReached ? ' · daily limit reached' : ''}
+      </p>
+    </div>
+  )
+}
+
+function PhotoReview({ items, meal, onLogAll, onRetake }: { items: DetectedItem[]; meal: Meal; onLogAll: (items: DetectedItem[]) => void; onRetake: () => void }) {
+  const [list, setList] = useState<DetectedItem[]>(items)
+  const totalKcal = Math.round(list.reduce((a, it) => a + (scaleNutrients(it.food.per100g, it.grams).kcal ?? 0), 0))
+
+  const setGrams = (i: number, grams: number) => setList((l) => l.map((it, j) => (j === i ? { ...it, grams } : it)))
+  const remove = (i: number) => setList((l) => l.filter((_, j) => j !== i))
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="eyebrow">Estimated · adjust & add</p>
+        <button onClick={onRetake} className="text-sand-200/60 text-sm flex items-center gap-1.5"><Camera size={14} /> Retake</button>
+      </div>
+
+      {list.map((it, i) => {
+        const n = scaleNutrients(it.food.per100g, it.grams)
+        return (
+          <div key={i} className="glass-soft p-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sand-50 text-sm font-medium flex-1 min-w-0 truncate">{it.food.name}</p>
+              <button onClick={() => remove(i)} className="text-sand-300/40 hover:text-dusk-rose p-1"><X size={15} /></button>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                inputMode="numeric"
+                value={String(it.grams)}
+                onChange={(e) => setGrams(i, Number(e.target.value.replace(/\D/g, '')) || 0)}
+                className="w-16 text-center bg-sand-800/40 border border-sand-600/40 rounded-lg py-1.5 text-sand-50 outline-none focus:border-gold/50"
+              />
+              <span className="text-sand-200/50 text-xs">g</span>
+              <span className="text-sand-200/55 text-xs ml-auto">{Math.round(n.kcal ?? 0)} kcal · P{Math.round(n.protein ?? 0)} C{Math.round(n.carbs ?? 0)} F{Math.round(n.fat ?? 0)}</span>
+            </div>
+          </div>
+        )
+      })}
+
+      {list.length === 0 ? (
+        <p className="text-sand-200/50 text-sm text-center py-4">No items left. <button onClick={onRetake} className="text-gold">Retake</button></p>
+      ) : (
+        <button onClick={() => onLogAll(list)} className="btn-gold w-full flex items-center justify-center gap-2">
+          <Plus size={18} /> Add {list.length} item{list.length > 1 ? 's' : ''} to {meal} · {totalKcal} kcal
+        </button>
+      )}
+      <p className="text-center text-sand-200/35 text-xs">AI estimate — check the amounts before logging.</p>
     </div>
   )
 }

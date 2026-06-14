@@ -1,8 +1,9 @@
 import { useRef, useState, type ReactNode } from 'react'
-import { Download, Upload, RotateCcw, Check, ChevronRight, User, Ruler, Target, Layers, SlidersHorizontal } from 'lucide-react'
-import { useStore, type Goal, type Sex } from '../store/useStore'
+import { Download, Upload, RotateCcw, Check, ChevronRight, User, Ruler, Target, Layers, SlidersHorizontal, Camera } from 'lucide-react'
+import { useStore, aiScansToday, AI_DAILY_CAP, type Goal, type Sex } from '../store/useStore'
 import { LEVELS, getLevel } from '../data/program'
 import { computeTargets } from '../lib/nutrition'
+import { getApiKey, setApiKey, hasApiKey, type AiModel } from '../lib/ai'
 import { PageHeader, Avatar } from '../components/ui'
 
 const goals: { id: Goal; label: string; hint: string; rate: number }[] = [
@@ -12,10 +13,12 @@ const goals: { id: Goal; label: string; hint: string; rate: number }[] = [
 ]
 
 export default function You() {
-  const { profile, currentLevel, sessions, setProfile, setLevel, exportData, importData, resetAll } = useStore()
+  const { profile, currentLevel, sessions, aiModel, aiUsage, setProfile, setLevel, setAiModel, exportData, importData, resetAll } = useStore()
   const fileRef = useRef<HTMLInputElement>(null)
   const [toast, setToast] = useState('')
   const [open, setOpen] = useState<string | null>(null)
+  const [aiKey, setAiKey] = useState(getApiKey())
+  const [showKeyHelp, setShowKeyHelp] = useState(false)
 
   const flash = (m: string) => {
     setToast(m)
@@ -113,6 +116,42 @@ export default function You() {
               <button key={l.id} onClick={() => setLevel(l.id)} className={`flex-1 py-2 rounded-xl border text-sm transition ${l.id === currentLevel ? 'bg-gold/15 border-gold/50 text-gold' : 'border-sand-600/40 text-sand-200/70'}`}>L{l.id}</button>
             ))}
           </div>
+        </Row>
+      </section>
+
+      {/* AI food scanner */}
+      <section className="glass p-1.5">
+        <Row icon={<Camera size={16} />} label="AI food scanner" value={hasApiKey() ? 'On' : 'Set up'} open={open === 'ai'} onClick={() => toggle('ai')} last>
+          <p className="text-sand-200/60 text-xs mb-3 leading-snug">
+            Estimate macros from a meal photo using your own Anthropic API key. Stored only on this device, pay-per-use (~0.5¢ per scan on Haiku).
+          </p>
+          <Field label="Anthropic API key">
+            <input
+              type="password"
+              className="input"
+              placeholder="sk-ant-..."
+              value={aiKey}
+              onChange={(e) => { setAiKey(e.target.value); setApiKey(e.target.value) }}
+            />
+          </Field>
+          <div className="mt-3">
+            <label className="block text-[10px] uppercase tracking-wider text-sand-200/50 mb-1.5">Model</label>
+            <div className="flex gap-2">
+              {(['haiku', 'sonnet', 'opus'] as AiModel[]).map((m) => (
+                <button key={m} onClick={() => setAiModel(m)} className={`flex-1 py-2 rounded-xl border text-sm capitalize transition ${aiModel === m ? 'bg-gold/15 border-gold/50 text-gold' : 'border-sand-600/40 text-sand-200/70'}`}>{m}</button>
+              ))}
+            </div>
+            <p className="text-sand-200/40 text-[10px] mt-1.5">Haiku ~0.5¢ · Sonnet ~2¢ · Opus ~3¢ per scan · {aiScansToday(aiUsage)}/{AI_DAILY_CAP} today</p>
+          </div>
+          <button onClick={() => setShowKeyHelp((o) => !o)} className="text-gold text-xs mt-3">{showKeyHelp ? 'Hide' : 'How do I get a key?'}</button>
+          {showKeyHelp && (
+            <ol className="text-sand-200/60 text-xs mt-2 space-y-1 list-decimal list-inside leading-relaxed">
+              <li>Go to console.anthropic.com and sign up / log in.</li>
+              <li>Add a little credit under Billing (e.g. $5 covers hundreds of scans).</li>
+              <li>Open API keys → Create key, copy it.</li>
+              <li>Paste it above. Optionally set a monthly spend limit in the console as a hard cap.</li>
+            </ol>
+          )}
         </Row>
       </section>
 

@@ -2,6 +2,9 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getLevel, LEVELS } from '../data/program'
 import { sumNutrients, type Food, type FoodLog, type Meal, type SavedMeal, type Nutrients, type ActivityLevel } from '../lib/nutrition'
+import type { AiModel } from '../lib/ai'
+
+export const AI_DAILY_CAP = 30 // max AI photo scans per day (cost safeguard)
 
 export type Goal = 'cut' | 'maintain' | 'bulk'
 export type Sex = 'male' | 'female'
@@ -70,6 +73,9 @@ export interface OasisState {
   foodLog: FoodLog[]
   savedFoods: Food[]
   savedMeals: SavedMeal[]
+  // AI photo scanner
+  aiModel: AiModel
+  aiUsage: { date: string; count: number }
 
   setProfile: (p: Partial<Profile>) => void
   setLevel: (level: number) => void
@@ -87,6 +93,8 @@ export interface OasisState {
   saveMeal: (name: string, items: { food: Food; grams: number }[]) => void
   deleteMeal: (id: string) => void
   logSavedMeal: (mealId: string, slot: Meal, date?: string) => void
+  setAiModel: (m: AiModel) => void
+  recordAiScan: () => void
   exportData: () => string
   importData: (json: string) => boolean
   resetAll: () => void
@@ -122,6 +130,8 @@ export const useStore = create<OasisState>()(
       foodLog: [],
       savedFoods: [],
       savedMeals: [],
+      aiModel: 'haiku',
+      aiUsage: { date: '', count: 0 },
 
       setProfile: (p) => set((s) => ({ profile: { ...s.profile, ...p } })),
 
@@ -210,6 +220,15 @@ export const useStore = create<OasisState>()(
           const d = date ?? todayISO()
           const entries: FoodLog[] = m.items.map((it) => ({ id: uid(), date: d, meal: slot, food: it.food, grams: it.grams }))
           return { foodLog: [...entries, ...s.foodLog] }
+        }),
+
+      setAiModel: (m) => set(() => ({ aiModel: m })),
+
+      recordAiScan: () =>
+        set((s) => {
+          const today = dayKey()
+          const count = s.aiUsage.date === today ? s.aiUsage.count + 1 : 1
+          return { aiUsage: { date: today, count } }
         }),
 
       exportData: () => {
@@ -359,6 +378,11 @@ export function dailyTotals(log: FoodLog[], date: Date | string = new Date()): N
 export function isSavedFood(savedFoods: Food[], food: Food): boolean {
   const key = food.barcode ?? food.id
   return savedFoods.some((f) => (f.barcode ?? f.id) === key)
+}
+
+/** AI photo scans used today (resets daily). */
+export function aiScansToday(usage: { date: string; count: number }): number {
+  return usage.date === dayKey() ? usage.count : 0
 }
 
 const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0)

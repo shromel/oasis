@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Trash2, Bookmark, Flame } from 'lucide-react'
+import { Plus, Bookmark, Flame, ChevronRight } from 'lucide-react'
 import ProgressRing from '../components/ProgressRing'
+import ServingSheet from '../components/ServingSheet'
 import { PageHeader, CriterionBar } from '../components/ui'
 import { useStore, foodLogForDay, dailyTotals } from '../store/useStore'
-import { computeTargets, scaleNutrients, sumNutrients, type Meal } from '../lib/nutrition'
+import { computeTargets, scaleNutrients, sumNutrients, type Meal, type FoodLog } from '../lib/nutrition'
 
 const MEALS: { id: Meal; label: string }[] = [
   { id: 'breakfast', label: 'Breakfast' },
@@ -13,7 +15,8 @@ const MEALS: { id: Meal; label: string }[] = [
 ]
 
 export default function Nourish() {
-  const { profile, foodLog, savedMeals, removeFoodLog, saveMeal } = useStore()
+  const { profile, foodLog, savedMeals, removeFoodLog, setFoodGrams, saveMeal } = useStore()
+  const [editing, setEditing] = useState<FoodLog | null>(null)
   const targets = computeTargets(profile)
   const totals = dailyTotals(foodLog)
   const today = foodLogForDay(foodLog)
@@ -85,15 +88,15 @@ export default function Nourish() {
                 {items.map((l) => {
                   const n = scaleNutrients(l.food.per100g, l.grams)
                   return (
-                    <li key={l.id} className="flex items-center gap-3 px-4 py-2.5">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sand-50 text-sm truncate">{l.food.name}</p>
-                        <p className="text-sand-200/50 text-xs mt-0.5">
-                          {l.grams} g · {Math.round(n.kcal ?? 0)} kcal · P{Math.round(n.protein ?? 0)} C{Math.round(n.carbs ?? 0)} F{Math.round(n.fat ?? 0)}
-                        </p>
-                      </div>
-                      <button onClick={() => removeFoodLog(l.id)} className="text-sand-300/40 hover:text-dusk-rose p-1.5">
-                        <Trash2 size={15} />
+                    <li key={l.id}>
+                      <button onClick={() => setEditing(l)} className="w-full flex items-center gap-3 px-4 py-2.5 text-left active:bg-sand-800/20 transition">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sand-50 text-sm truncate">{l.food.name}</p>
+                          <p className="text-sand-200/50 text-xs mt-0.5">
+                            {l.grams} g · {Math.round(n.kcal ?? 0)} kcal · P{Math.round(n.protein ?? 0)} C{Math.round(n.carbs ?? 0)} F{Math.round(n.fat ?? 0)}
+                          </p>
+                        </div>
+                        <ChevronRight size={15} className="text-sand-300/30 shrink-0" />
                       </button>
                     </li>
                   )
@@ -108,6 +111,17 @@ export default function Nourish() {
         <p className="text-center text-sand-200/40 text-xs pt-1">
           {savedMeals.length} saved meal{savedMeals.length > 1 ? 's' : ''} · tap + on a meal to quick-log
         </p>
+      )}
+
+      {editing && (
+        <ServingSheet
+          food={editing.food}
+          mode="edit"
+          initialGrams={editing.grams}
+          onCancel={() => setEditing(null)}
+          onConfirm={(g) => { setFoodGrams(editing.id, g); setEditing(null) }}
+          onRemove={() => { removeFoodLog(editing.id); setEditing(null) }}
+        />
       )}
     </div>
   )
