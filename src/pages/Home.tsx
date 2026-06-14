@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { Flame, CalendarCheck, ChevronRight, TrendingUp } from 'lucide-react'
+import { Flame, CalendarCheck, Dumbbell, TrendingUp, Play } from 'lucide-react'
 import LevelTrajectory from '../components/LevelTrajectory'
 import ProgressRing from '../components/ProgressRing'
+import { Avatar, PageHeader, StatTile, CriterionBar, InfoChip } from '../components/ui'
 import { useStore, computeStreak, sessionsThisWeek, levelProgress, bloomScore, levelProgressSeries } from '../store/useStore'
 import { getLevel, LEVELS } from '../data/program'
 
@@ -24,63 +25,54 @@ export default function Home() {
   const nextLevel = Math.min(level.id + 1, LEVELS.length)
   const trajectoryPct = series.length ? series[series.length - 1].pct : pct
 
-  const today = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+  // Today's suggested block (the level's Outdoor block) for the CTA.
+  const todayBlock = level.blocks[0]
+  const exCount = todayBlock.exercises.length
+  const mins = Math.round(exCount * 4.5)
 
   return (
-    <div className="space-y-3 pt-3">
-      <header className="flex items-baseline justify-between">
-        <h1 className="heading text-2xl">
-          {greeting()}
-          {profile.name ? <span className="gold-text">, {profile.name}</span> : null}
-        </h1>
-        <p className="text-sand-200/50 text-xs">{today}</p>
-      </header>
+    <div className="space-y-3 pt-1">
+      <PageHeader
+        eyebrow={`${greeting()}${profile.name ? `, ${profile.name}` : ''}`}
+        title="Your oasis"
+        right={<Avatar size={40} />}
+      />
 
-      {/* Hero: log-driven trajectory toward the next level */}
+      {/* Trajectory hero */}
       <section className="glass overflow-hidden">
-        <div className="relative h-[132px]">
-          {series.length > 0 && <LevelTrajectory data={series} className="absolute inset-0 w-full h-full" />}
-          {/* left scrim so the numbers stay legible over the curve */}
-          <div className="absolute inset-0 bg-gradient-to-r from-sand-950/80 via-sand-950/30 to-transparent" />
-          <div className="absolute inset-0 p-4 flex flex-col justify-between">
-            <div>
-              <p className="text-sand-200/55 text-[10px] uppercase tracking-[0.18em]">
-                {series.length ? `Trajectory · Level ${nextLevel}` : level.name}
-              </p>
-              <p className="font-display text-[2.6rem] leading-none mt-1 gold-text">{trajectoryPct}%</p>
-            </div>
-            <div className="flex items-end justify-between">
-              <p className="text-sand-200/45 text-[10px]">
-                {series.length ? 'from your training logs' : level.exit.text}
-              </p>
-              <span className="chip">Lv {level.id} · {level.name}</span>
-            </div>
+        <div className="flex items-start justify-between px-4 pt-4">
+          <div>
+            <p className="eyebrow">Trajectory · L{nextLevel}</p>
+            <p className="font-display text-[2.4rem] leading-none mt-1 gold-text">{trajectoryPct}%</p>
+            <p className="text-sand-200/70 text-[0.78rem] mt-0.5">toward L{nextLevel}</p>
           </div>
+          {bloom.trendPct != null && bloom.trendPct !== 0 && (
+            <InfoChip>
+              <TrendingUp size={12} /> {bloom.trendPct >= 0 ? '+' : ''}
+              {bloom.trendPct}% trend
+            </InfoChip>
+          )}
         </div>
-        <div className="grid grid-cols-3 divide-x divide-sand-700/40 border-t border-sand-700/40">
-          <Stat icon={<Flame size={15} className="text-dusk-rose" />} value={`${streak}`} label="streak" />
-          <Stat icon={<CalendarCheck size={15} className="text-oasis-palm" />} value={`${week}`} label="this week" />
-          <Stat
-            icon={<TrendingUp size={15} className="text-gold" />}
-            value={bloom.trendPct == null ? '—' : `${bloom.trendPct >= 0 ? '+' : ''}${bloom.trendPct}%`}
-            label="momentum"
-          />
+        <div className="relative h-[120px] mt-1.5">
+          {series.length > 0 && <LevelTrajectory data={series} className="absolute inset-0 w-full h-full" />}
+        </div>
+      </section>
+
+      {/* 3-up stat row */}
+      <section className="glass overflow-hidden">
+        <div className="grid grid-cols-3 divide-x divide-sand-700/40">
+          <StatTile icon={<Flame size={15} className="text-dusk-rose" />} value={streak} label="day streak" />
+          <StatTile icon={<CalendarCheck size={15} className="text-oasis-palm" />} value={week} label="this week" />
+          <StatTile icon={<Dumbbell size={15} className="text-gold" />} value={sessions.length} label="sessions" />
         </div>
       </section>
 
       {/* Path to next level */}
       <section className="glass p-4">
-        <div className="flex items-center justify-between mb-0.5">
-          <h2 className="heading text-base">Path to Level {Math.min(level.id + 1, LEVELS.length)}</h2>
-          <Link to="/progress" className="text-gold text-xs flex items-center">
-            details <ChevronRight size={14} />
-          </Link>
-        </div>
-        <p className="text-sand-200/55 text-xs mb-3">{level.tagline}</p>
-
+        <p className="eyebrow mb-3">Path to L{nextLevel}</p>
         <div className="flex items-center gap-4">
-          <ProgressRing value={pct} label={`${pct}%`} sublabel="exit" size={84} />
-          <div className="flex-1 space-y-2">
+          <ProgressRing value={pct} label={`${pct}%`} sublabel="exit" size={88} />
+          <div className="flex-1 space-y-2.5">
             {items.length > 0 ? (
               items.map((it) => (
                 <CriterionBar key={it.key} label={it.label} current={it.current} goal={it.goal} unit={it.unit} />
@@ -92,55 +84,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Train CTA */}
-      <Link to="/train" className="block">
+      {/* Today CTA */}
+      <Link to={`/train/${level.id}/${todayBlock.id}`} className="block">
         <section className="glass p-4 flex items-center justify-between active:scale-[0.99] transition">
           <div>
-            <p className="text-sand-200/55 text-[10px] uppercase tracking-widest">Today</p>
-            <p className="heading text-lg mt-0.5">Start a session</p>
-            <p className="text-sand-200/55 text-xs mt-0.5">Outdoor bar · Home floor</p>
+            <p className="font-display text-[1.15rem] text-sand-50 leading-tight">
+              Today · {todayBlock.label}
+            </p>
+            <p className="text-sand-200/60 text-xs mt-1">
+              {exCount} exercises · ~{mins} min
+            </p>
           </div>
-          <div className="btn-gold !px-3.5 !py-3.5 rounded-2xl">
-            <ChevronRight size={20} />
-          </div>
+          <span className="btn-gold flex items-center gap-1.5 text-sm !px-4 !py-2.5">
+            <Play size={15} /> Start
+          </span>
         </section>
       </Link>
-    </div>
-  )
-}
-
-function Stat({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-2.5 gap-0.5">
-      <div className="flex items-center gap-1.5">
-        {icon}
-        <span className="font-display text-xl leading-none text-sand-50">{value}</span>
-      </div>
-      <span className="text-sand-200/50 text-[10px]">{label}</span>
-    </div>
-  )
-}
-
-function CriterionBar({ label, current, goal, unit }: { label: string; current: number; goal: number; unit: string }) {
-  const pct = Math.min(100, Math.round((current / goal) * 100))
-  const done = current >= goal
-  return (
-    <div>
-      <div className="flex justify-between text-[11px] mb-1">
-        <span className="text-sand-100/80">{label}</span>
-        <span className={done ? 'text-oasis-palm font-semibold' : 'text-sand-200/70'}>
-          {current}{unit} / {goal}{unit}
-        </span>
-      </div>
-      <div className="h-1.5 rounded-full bg-sand-800/60 overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-700"
-          style={{
-            width: `${pct}%`,
-            background: done ? '#5aa469' : 'linear-gradient(90deg,#f6d488,#e7b24c)',
-          }}
-        />
-      </div>
     </div>
   )
 }

@@ -1,43 +1,46 @@
-import { ScanBarcode, Donut, Gauge, Scale } from 'lucide-react'
+import { ScanBarcode } from 'lucide-react'
+import ProgressRing from '../components/ProgressRing'
+import { PageHeader, CriterionBar, InfoChip } from '../components/ui'
+import { useStore } from '../store/useStore'
+import { mifflinStTdee } from '../lib/nutrition'
 
-const previews = [
-  { icon: ScanBarcode, title: 'Barcode scanning', desc: 'Point your phone camera at any product — instant macros & micros via Open Food Facts.' },
-  { icon: Donut, title: 'Macros & micros', desc: 'Protein / carbs / fat rings plus full vitamin & mineral tracking, Cronometer-style.' },
-  { icon: Gauge, title: 'Nutrition score', desc: 'A daily 0–100 quality score from how completely you hit your micronutrient targets.' },
-  { icon: Scale, title: 'Calorie balance', desc: 'Surplus / deficit vs a target computed from your stats, themed to your bulk or cut.' },
-]
-
+// Preview / "soon" state. Nutrition logging arrives in v0.2; the macro numbers
+// below are a sample so the surface reads true to the design. The calorie
+// target is real (Mifflin-St Jeor from your profile) when your stats are set.
 export default function Nourish() {
-  return (
-    <div className="space-y-5 pt-4">
-      <header>
-        <h1 className="heading text-3xl">Nourish</h1>
-        <p className="text-sand-200/60 text-sm mt-1">The other half of the oasis — arriving next.</p>
-      </header>
+  const profile = useStore((s) => s.profile)
+  const energy = mifflinStTdee(profile)
+  const calorieTarget = energy?.target ?? 2400
 
-      <section className="glass p-6 text-center">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-gold/15 grid place-items-center shadow-glow mb-4">
-          <ScanBarcode size={30} className="text-gold" />
+  return (
+    <div className="space-y-3 pt-1">
+      <PageHeader eyebrow="Fuel the bloom" title="Nourish" right={<InfoChip tone="gold">soon</InfoChip>} />
+
+      <section className="glass p-[18px]">
+        <div className="flex items-center gap-4">
+          <ProgressRing value={72} label="72" sublabel="score" size={88} />
+          <div className="flex-1 space-y-2.5">
+            <CriterionBar label="Protein" current={132} goal={170} unit="g" />
+            <CriterionBar label="Carbs" current={180} goal={220} unit="g" />
+            <CriterionBar label="Fat" current={54} goal={60} unit="g" />
+          </div>
         </div>
-        <h2 className="heading text-xl">Fuel the bloom</h2>
-        <p className="text-sand-200/60 text-sm mt-2 max-w-xs mx-auto">
-          Training grows the oasis; nutrition keeps it alive. This is scaffolded and next on the roadmap.
-        </p>
+        <div className="flex items-center justify-between mt-4 pt-3.5 border-t border-sand-700/40">
+          <span className="text-sand-200/70 text-sm">Calories</span>
+          <span className="font-display text-[1.1rem]">
+            <span className="gold-text">2,040</span>
+            <span className="text-sand-200/50 text-sm"> / {calorieTarget.toLocaleString()}</span>
+          </span>
+        </div>
       </section>
 
-      <div className="grid gap-3">
-        {previews.map((p) => (
-          <div key={p.title} className="glass p-4 flex gap-4 items-start">
-            <div className="w-11 h-11 shrink-0 rounded-2xl bg-sand-800/50 grid place-items-center">
-              <p.icon size={20} className="text-gold" />
-            </div>
-            <div>
-              <p className="text-sand-50 font-medium">{p.title}</p>
-              <p className="text-sand-200/55 text-sm mt-0.5 leading-snug">{p.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      <button className="btn-gold w-full flex items-center justify-center gap-2 text-base opacity-90">
+        <ScanBarcode size={16} /> Scan a food
+      </button>
+
+      <p className="text-center text-sand-200/35 text-xs mt-3">
+        Diary, micros &amp; calorie balance — coming in v0.2.
+      </p>
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronDown, Play, Check, Pencil } from 'lucide-react'
 import { LEVELS, WARMUPS, getLevel, type Block, type Exercise } from '../data/program'
 import { useStore, todaySessionForBlock } from '../store/useStore'
+import { PageHeader } from '../components/ui'
 
 export default function Train() {
   const navigate = useNavigate()
@@ -14,11 +15,8 @@ export default function Train() {
   const level = getLevel(viewLevel)
 
   return (
-    <div className="space-y-5 pt-4">
-      <header>
-        <h1 className="heading text-3xl">Train</h1>
-        <p className="text-sand-200/60 text-sm mt-1">Your program, imported and ready.</p>
-      </header>
+    <div className="space-y-4 pt-1">
+      <PageHeader eyebrow="Your program" title="Train" />
 
       {/* level selector */}
       <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-1">
